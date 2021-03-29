@@ -2,6 +2,7 @@ package whole
 
 import common.StarvConfig
 import org.apache.spark.sql.{SaveMode, SparkSession}
+import udf.UDFRegister
 import utils.BroadcastUtils
 
 /**
@@ -20,6 +21,12 @@ object ShopGoodsAnalysis {
 
     val dt = args(0)
 
+    //注册udf
+    UDFRegister.skuMapping(spark,dt)
+    UDFRegister.industryMapping(spark,dt)
+    UDFRegister.shopMapping(spark,dt)
+
+
 
     spark.sql(
       """
@@ -37,15 +44,12 @@ object ShopGoodsAnalysis {
      *付款金额 = 支付金额
      *支付率
      */
-    val getSkuName = BroadcastUtils.getItemNameMap(spark, dt)
-    spark.udf.register("sku_mapping", func = (skuId: Long) => {
-      getSkuName.value.getOrElse(skuId,"")
-    })
+
     spark.sql(
       s"""
          |SELECT
          |sku_id,
-         |sku_mapping(sku_id),
+         |sku_mapping(sku_id) as sku_name,
          |count(distinct order_id) as order_number, --下单笔数
          |sum(payment_total_money) as order_money_number, --下单金额
          |count(distinct case when paid = 2  then order_id end) as payment_number, --付款笔数
@@ -112,11 +116,6 @@ object ShopGoodsAnalysis {
          |""".stripMargin).write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url,"goods_sale",StarvConfig.properties)
-    //映射 industry 名称
-    val value = BroadcastUtils.getIndustryNameMap(spark, dt)
-    spark.udf.register("industry_mapping", func = (industry: String) => {
-      value.value.getOrElse(industry,"")
-    })
     /**
      * 全平台下单行业分布比例
      */
@@ -237,13 +236,6 @@ object ShopGoodsAnalysis {
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url,"goods_sale",StarvConfig.properties)
-
-
-    val getShopName = BroadcastUtils.getShopNameMap(spark, dt)
-    spark.udf.register("shop_mapping", func = (skuId: Long) => {
-      getShopName.value.getOrElse(skuId,"")
-    })
-
     spark.sql(
       """
         |select
@@ -254,9 +246,6 @@ object ShopGoodsAnalysis {
         |all_money
         |order by all_payment_money desc
         |""".stripMargin).show(10)
-
-
-
     //商家数量
     spark.sql(
       """

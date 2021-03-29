@@ -176,7 +176,7 @@ shop_id 商铺ID
 包含指标
 
 ```
-下单客户数( 商品分析-商品明细)
+下单客户数( 商品分析-商品明细)   跟getPayIndex合并
 ```
 
 | shop_id | sku_id  | sale_user_count | dt   |
@@ -194,6 +194,7 @@ shop_id 商铺ID
 --------------------
 访问-支付转化率：--需埋点(暂时为空)
 支付客户数/访客数。
+下单客户数( 商品分析-商品明细)
 ```
 
 | shop_id | sku_id  | paid_number | sale_user_count | sale_succeed_money | sku_rate   | dt   |

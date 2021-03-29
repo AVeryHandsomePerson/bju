@@ -3,6 +3,7 @@ package shop
 import common.StarvConfig
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.joda.time.DateTime
+import udf.UDFRegister
 
 object OneGoodsAnalysis {
   def main(args: Array[String]): Unit = {
@@ -13,6 +14,9 @@ object OneGoodsAnalysis {
       .enableHiveSupport()
       .getOrCreate()
     val dt = args(0)
+
+    //注册udf
+    UDFRegister.skuMapping(spark,dt)
     //解析hdfs_page -- 需埋点
 //    spark.sql(
 //      """
@@ -94,28 +98,28 @@ object OneGoodsAnalysis {
      * 下单客户数( 商品分析-商品明细)：
      * 下单商品的客户数，下单即算，包含下单未支付订单，不剔除取消订单
      */
-    spark.sql(
-      s"""
-         |with t1 as(
-         |select
-         |shop_id,
-         |sku_id,
-         |buyer_id
-         |from
-         |dwd.dw_orders_merge_detail
-         |group by shop_id,sku_id,buyer_id
-         |)
-         |select
-         |shop_id,
-         |sku_id,
-         |count(distinct order_id) as sale_user_count,
-         |$dt as dt
-         |from t1
-         |group by shop_id,sku_id
-         |""".stripMargin)
-      .write
-      .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"order_sale_user",StarvConfig.properties)
+//    spark.sql(
+//      s"""
+//         |with t1 as(
+//         |select
+//         |shop_id,
+//         |sku_id,
+//         |buyer_id
+//         |from
+//         |dwd.dw_orders_merge_detail
+//         |group by shop_id,sku_id,buyer_id
+//         |)
+//         |select
+//         |shop_id,
+//         |sku_id,
+//         |count(distinct order_id) as sale_user_count,
+//         |$dt as dt
+//         |from t1
+//         |group by shop_id,sku_id
+//         |""".stripMargin)
+//      .write
+//      .mode(SaveMode.Append)
+//      .jdbc(StarvConfig.url,"order_sale_user",StarvConfig.properties)
 
     /**
      * 支付件数
@@ -124,25 +128,34 @@ object OneGoodsAnalysis {
      * --------------------
      * 访问-支付转化率：--需埋点
      * 支付客户数/访客数。
+     * 下单客户数( 商品分析-商品明细)：
+     * 下单商品的客户数，下单即算，包含下单未支付订单，不剔除取消订单
      */
     spark.sql(
       s"""
         |select
         |shop_id,
         |sku_id,
-        |sum(num) as paid_number,
-        |count(distinct buyer_id) as sale_user_count,
-        |round(sum(payment_total_money),2) as sale_succeed_money,
+        |sku_mapping(sku_id) sku_name,
+        |cost_price, --成本价
+        |sum(case when paid = 2 then num end) as paid_number,
+        |count(distinct case when paid = 2 then buyer_id end) as sale_user_count, -- 成交的下单用户数
+        |round(sum(case when paid = 2 then payment_total_money end),2) as sale_succeed_money, --支付金额
+        |count(distinct buyer_id) as sale_user_count, -- 总下单用户数
         |''as sku_rate,
         |$dt as dt
         |from
         |dwd.dw_orders_merge_detail
-        |where paid = 2
         |group by shop_id,sku_id
         |""".stripMargin)
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url,"pay_index_info",StarvConfig.properties)
+
+
+
+
+
 
     /**
      *下单-转化率： -- 需埋点
