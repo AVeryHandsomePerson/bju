@@ -105,7 +105,7 @@ object ShopGoodsAnalysis {
          |round(count(order_id) / $paymentUserNumber,2) as payment_place_ratio,
          |$dt
          |from
-         |dw_shop_order
+         |dwd.dw_shop_order
          |where paid = 2
          |group by
          |order_source
@@ -124,15 +124,35 @@ object ShopGoodsAnalysis {
       s"""
          |select
          |industry,
-         |industry_mapping(industry),
+         |industry_mapping(industry) as industry_name,
          |count(order_id) as payment_order_number,
          |$dt
          |from
-         |dw_shop_order
+         |dwd.dw_shop_order
          |where paid = 2
          |group by
          |industry
-         |""".stripMargin)  .write
+         |""".stripMargin)
+      .write
+      .mode(SaveMode.Append)
+      .jdbc(StarvConfig.url,"goods_sale",StarvConfig.properties)
+
+    /**
+     * 全平台行业分布比例
+     */
+    spark.sql(
+      s"""
+         |select
+         |industry,
+         |industry_mapping(industry) as industry_name,
+         |count(order_id) as payment_order_number,
+         |$dt
+         |from
+         |dwd.dw_shop_order
+         |group by
+         |industry
+         |""".stripMargin)
+      .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url,"goods_sale",StarvConfig.properties)
 
@@ -209,7 +229,7 @@ object ShopGoodsAnalysis {
          |count(order_id) as payment_order_number,
          |$dt
          |from
-         |dw_shop_order
+         |dwd.dw_shop_order
          |where paid = 2
          |group by
          |shop_id,industry
@@ -235,6 +255,27 @@ object ShopGoodsAnalysis {
         |order by all_payment_money desc
         |""".stripMargin).show(10)
 
+
+
+    //商家数量
+    spark.sql(
+      """
+        |select
+        |count(1) as shop_number,
+        |count(case when status = 5 then 1 end) as business_number,
+        |count(case when status = 4 then 1 end) as no_business_number
+        |from ods.shop_info
+        |""".stripMargin)
+   //商家类型
+    spark.sql(
+      """
+        |select
+        |shop_type,
+        |count(1) as shop_number
+        |from ods.shop_info
+        |group by shop_type
+        |""".stripMargin)
+    //
 
 
 
