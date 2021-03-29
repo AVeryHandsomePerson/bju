@@ -65,7 +65,7 @@ public class GoodsService {
         return goodsDao.getClientSale(shopId, dt);
     }
     //客户采购排行榜
-    public List<ClientSaleBean> getClientSaleTopType(String shopId, String dt, String orderType) {
+    public List<ClientSaleTopBean> getClientSaleTopType(String shopId, String dt, String orderType) {
         return goodsDao.getClientSaleTopType(shopId, dt,orderType);
     }
 

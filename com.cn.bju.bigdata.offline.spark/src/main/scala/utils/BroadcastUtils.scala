@@ -42,4 +42,40 @@ object BroadcastUtils {
       .toMap
     spark.sparkContext.broadcast(industryMap)
   }
+
+  def getItemNameMap(spark: SparkSession,dt:String): Broadcast[Map[Long, String]] = {
+    import spark.implicits._
+    val industryMap = spark.sql(
+      s"""
+         |select
+         |sku_id,
+         |item_name
+         |from
+         |dwd.dwd_sku_name
+         |where dt = $dt
+         |""".stripMargin)
+      .map(row => (row.getLong(0), row.getString(1)))
+      .collect()
+      .toMap
+    spark.sparkContext.broadcast(industryMap)
+  }
+
+  def getShopNameMap(spark: SparkSession,dt:String): Broadcast[Map[Long, String]] = {
+    import spark.implicits._
+    val industryMap = spark.sql(
+      s"""
+         |select
+         |shop_id,
+         |shop_name
+         |from
+         |ods.shop_info
+         |where dt = $dt
+         |""".stripMargin)
+      .map(row => (row.getLong(0), row.getString(1)))
+      .collect()
+      .toMap
+    spark.sparkContext.broadcast(industryMap)
+  }
+
+
 }

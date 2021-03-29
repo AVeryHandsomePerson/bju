@@ -7,42 +7,50 @@ package com.cn.bju.spring.bigdataspringboot.bean.shop;
  */
 public class ClientSaleTopBean {
     private Integer shopId;
-    private String order_type;
-    private String user_name;
-    private Integer sale_succeed_money;
-    private Integer sale_succeed_profit;
+    private String orderType;
+    private String userName;
+    private Integer saleSucceedMoney;
+    private Integer saleSucceedProfit;
     private String dt;
 
-    public String getOrder_type() {
-        return order_type;
+    public Integer getShopId() {
+        return shopId;
     }
 
-    public void setOrder_type(String order_type) {
-        this.order_type = order_type;
+    public void setShopId(Integer shopId) {
+        this.shopId = shopId;
     }
 
-    public String getUser_name() {
-        return user_name;
+    public String getOrderType() {
+        return orderType;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 
-    public Integer getSale_succeed_money() {
-        return sale_succeed_money;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setSale_succeed_money(Integer sale_succeed_money) {
-        this.sale_succeed_money = sale_succeed_money;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public Integer getSale_succeed_profit() {
-        return sale_succeed_profit;
+    public Integer getSaleSucceedMoney() {
+        return saleSucceedMoney;
     }
 
-    public void setSale_succeed_profit(Integer sale_succeed_profit) {
-        this.sale_succeed_profit = sale_succeed_profit;
+    public void setSaleSucceedMoney(Integer saleSucceedMoney) {
+        this.saleSucceedMoney = saleSucceedMoney;
+    }
+
+    public Integer getSaleSucceedProfit() {
+        return saleSucceedProfit;
+    }
+
+    public void setSaleSucceedProfit(Integer saleSucceedProfit) {
+        this.saleSucceedProfit = saleSucceedProfit;
     }
 
     public String getDt() {
@@ -53,22 +61,14 @@ public class ClientSaleTopBean {
         this.dt = dt;
     }
 
-    public Integer getShopId() {
-        return shopId;
-    }
-
-    public void setShopId(Integer shopId) {
-        this.shopId = shopId;
-    }
-
     @Override
     public String toString() {
         return "ClientSaleTopBean{" +
                 "shopId=" + shopId +
-                ", order_type='" + order_type + '\'' +
-                ", user_name='" + user_name + '\'' +
-                ", sale_succeed_money=" + sale_succeed_money +
-                ", sale_succeed_profit=" + sale_succeed_profit +
+                ", orderType='" + orderType + '\'' +
+                ", userName='" + userName + '\'' +
+                ", saleSucceedMoney=" + saleSucceedMoney +
+                ", saleSucceedProfit=" + saleSucceedProfit +
                 ", dt='" + dt + '\'' +
                 '}';
     }

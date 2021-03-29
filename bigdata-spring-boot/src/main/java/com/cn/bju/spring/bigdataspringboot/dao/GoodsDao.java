@@ -50,7 +50,7 @@ public interface GoodsDao {
     List<ClientSaleBean> getClientSale(String shopId, String dt);
 
     //客户采购排行榜
-    List<ClientSaleBean> getClientSaleTopType(String shopId, String dt, String orderType);
+    List<ClientSaleTopBean> getClientSaleTopType(String shopId, String dt, String orderType);
 
 
     //全平台

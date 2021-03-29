@@ -82,37 +82,17 @@ object OrdersMiddle {
          |left join t3 c
          |on a.order_id = c.order_id
          |""".stripMargin)
-    //生成 退货表+退货详情表  后续获取当天分区的
+    //生成 退货表  后续获取当天分区的
     spark.sql(
       """
-        |with t1 as (
         |select
         |id,
         |order_id,
         |create_time,
         |refund_status,
-        |modify_time
+        |modify_time,
+        |refund_total_money as refund_money
         |from dwd.fact_refund_apply
-        |),
-        |t2 as (
-        |select
-        |id,
-        |refund_id,
-        |refund_money
-        |from dwd.fact_refund_detail
-        |)
-        |select
-        |a.id,
-        |a.order_id,
-        |a.create_time,
-        |a.refund_status,
-        |a.modify_time,
-        |b.refund_money
-        |from
-        |t1 a
-        |left join
-        |t2 b
-        |on a.id = b.refund_id
         |""".stripMargin).createOrReplaceTempView("refund_tmp")
     //订单关联退货表 存在1对多
     spark.sql(
@@ -146,6 +126,7 @@ object OrdersMiddle {
     spark.sql(
       """
         |select
+        |a.shop_id,
         |a.order_id,
         |a.order_source,
         |a.paid,
@@ -160,6 +141,33 @@ object OrdersMiddle {
         |(select * from ods.ods_plat_industry_rel) c
         |on b.plat_industry_rel_id = c.id
         |""".stripMargin).createOrReplaceTempView("dw_shop_order")
+
+    //生成sku 信息和item 商城表 关联出 sku 和 商品名称总表 按天分区
+
+    spark.sql(
+      s"""
+        |insert overwrite table dwd.dwd_sku_name
+        |select
+        |a.sku_id,
+        |b.item_name
+        |from
+        |(select
+        |*
+        |from
+        |ods.ods_item_sku
+        |where dt = $dt) a
+        |left join
+        |(
+        |select
+        |*
+        |from
+        |ods.ods_item
+        |) b
+        |on a.item_id = b.item_id
+        |""".stripMargin)
+
+
+
 
 
 

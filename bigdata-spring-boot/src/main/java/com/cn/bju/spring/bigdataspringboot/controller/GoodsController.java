@@ -180,7 +180,7 @@ public class GoodsController {
         String dt = param.getOrDefault("dt", "");
         String orderType = param.getOrDefault("type", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt) && StringUtils.isNotEmpty(orderType)) {
-            data.setData(goodsService.getClientSaleType(shopId, dt, orderType));
+            data.setData(goodsService.getClientSaleTopType(shopId, dt, orderType));
             data.setCode(1000);
             return data;
         }

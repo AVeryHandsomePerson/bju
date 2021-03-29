@@ -1,41 +1,4 @@
 --商品表
-CREATE TABLE `item` (
-`item_id` string COMMENT '商品id',
-`item_name` string COMMENT '商品名称',
-`cid` string COMMENT '类目ID',
-`seller_id` string COMMENT '商家ID',
-`item_status` string COMMENT '商品状态,1:未发布，2：待审核，20：审核驳回，3：待上架，4：在售，5：已下架，6：锁定， 7： 申请解锁',
-`attributes` string COMMENT '商品类目属性keyId:valueId;',
-`attr_sale` string COMMENT '商品销售属性keyId:valueId;',
-`created` string COMMENT '创建日期',
-`modified` string COMMENT '修改日期',
-`shop_cid` string COMMENT '商品所属店铺类目id',
-`brand` string COMMENT '品牌',
-`market_price` string COMMENT '市场价',
-`market_price2` string COMMENT '成本价',
-`inventory` string COMMENT '库存量',
-`weight` string COMMENT '商品毛重',
-`product_id` string COMMENT '商品货号',
-`describe_url` string COMMENT '商品描述url，存在jfs中',
-`packing_list` string COMMENT '包装清单',
-`after_service` string COMMENT '售后服务',
-`ad` string COMMENT '广告词',
-`timing_listing` string COMMENT '定时上架，为空则表示未设置定时上架',
-`listting_time` string COMMENT '上架时间',
-`delisting_time` string COMMENT '下架时间',
-`operator` string COMMENT '操作方，1：商家，2：平台',
-`status_change_reason` string COMMENT '平台方下架或锁定或审核驳回时给出的理由',
-`shop_id` string COMMENT '店铺ID',
-`guide_price` string COMMENT '商城指导价',
-`origin` string COMMENT '商品产地',
-`add_source` string COMMENT '来源：1自定义添加2：从平台商品库选择',
-`plat_link_status` string COMMENT '与平台商品库关联状态：1：未符合待入库2：待入库3：已入库4：删除',
-`has_price` string COMMENT '是否有报价：1：有价格；2：暂无报价',
-`plst_item_id` string COMMENT '平台商品ID，只有add_source为2时值才有意义',
-`good_type` string COMMENT '商品类型: 1代表应用,  2代表服务',
-`app_id` string COMMENT '开发者中心 发过应用 ID'
-);
-
 CREATE external  TABLE `ods_start_log` (
 url string COMMENT '当前页面url',
 refer string COMMENT '跳转页面url',
@@ -328,3 +291,34 @@ select
     date_format(create_time,'yyyyMMdd')
 from
     ods.ods_item
+
+
+create external table ods.ods_item_sku
+(
+    sku_id         bigint             comment '主键',
+    item_id        bigint          comment '商品id',
+    seller_id      bigint          comment '卖家id',
+    shop_id        bigint          comment '店铺id',
+    attributes     string          comment '销售属性集合：keyId:valueId',
+    sku_code       string          comment '商家sku编码',
+    status         int             comment 'sku 状态,1:有效;2:无效',
+    create_time    string          comment '创建日期',
+    update_time    string          comment '修改日期',
+    create_user    bigint         ,
+    update_user    bigint         ,
+    yn             int             comment '0：无效 1：有效;',
+    source_item_id bigint          comment '原商品ID',
+    source_sku_id  bigint          comment '原SKUID',
+    master_item_id bigint          comment '主商品ID',
+    master_sku_id  bigint          comment '主SKUID'
+)
+    comment 'sku信息'
+PARTITIONED BY (
+  dt string
+)
+stored as orc
+location '/user/hive/warehouse/ods.db/ods_item_sku'
+tblproperties ("orc.compression"="snappy");
+
+ALTER TABLE ods_item_sku ADD IF NOT EXISTS PARTITION (dt='20210325') location '/user/hive/warehouse/ods.db/ods_item_sku/dt=20210325/';
+
