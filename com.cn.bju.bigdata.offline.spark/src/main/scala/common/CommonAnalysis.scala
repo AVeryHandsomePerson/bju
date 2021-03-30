@@ -70,7 +70,7 @@ object CommonAnalysis {
       .jdbc(StarvConfig.url,"successful_transaction",StarvConfig.properties)
     /**
      * 客单价
-     * 客单价=成交金额/成交客户数。
+     *  =成交金额/成交客户数。
      * 2.0
      * 新增维度
      * order_type 平台类型
@@ -150,11 +150,14 @@ object CommonAnalysis {
       .jdbc(StarvConfig.url,"client_one_price",StarvConfig.properties)
 
 
+
     /**
      * 商品省份TOP 10
      * 1.统计支付人数
      * 2.统计支付金额
      * 3.统计支付金额占总支付金额比例
+     * 地势分布
+     * 包含： 商家交易分析 模块
      */
     spark.sql(
       s"""
@@ -174,8 +177,7 @@ object CommonAnalysis {
         |province_name,
         |sale_user_count,
         |sale_succeed_money,
-        |sum(sale_succeed_money) over(partition by shop_id) as total_province_money,
-        |row_number() over(partition by shop_id,province_name order by sale_succeed_money desc) as money_top
+        |sum(sale_succeed_money) over(partition by shop_id) as total_province_money
         |from
         |t1
         |)
@@ -184,11 +186,10 @@ object CommonAnalysis {
         |province_name,
         |sale_user_count,
         |sale_succeed_money,
-        |round(sale_succeed_money/total_province_money,2) as sale_ratio,
+        |round(sale_succeed_money/total_province_money,2) as sale_ratio
         |$dt as dt
         |from
         |t2
-        |where money_top <=15
         |""".stripMargin)
       .write
       .mode(SaveMode.Append)

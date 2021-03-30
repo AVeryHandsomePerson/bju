@@ -77,5 +77,21 @@ object BroadcastUtils {
     spark.sparkContext.broadcast(industryMap)
   }
 
+  def getShopTypeMap(spark: SparkSession,dt:String): Broadcast[Map[Long, String]] = {
+    import spark.implicits._
+    val industryMap = spark.sql(
+      s"""
+         |select
+         |code,
+         |name
+         |from
+         |ods.ods_base_dictionary
+         |where dt = $dt
+         |""".stripMargin)
+      .map(row => (row.getLong(0), row.getString(1)))
+      .collect()
+      .toMap
+    spark.sparkContext.broadcast(industryMap)
+  }
 
 }

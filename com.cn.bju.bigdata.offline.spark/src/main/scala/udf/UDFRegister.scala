@@ -2,7 +2,7 @@ package udf
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import utils.BroadcastUtils
+import utils.{BroadcastUtils, TypeUtils}
 
 /**
   * @Auther: ljh
@@ -32,4 +32,16 @@ object UDFRegister {
     })
   }
 
+  def shopTypeMapping(spark:SparkSession,dt:String): Unit ={
+    val getSkuName = BroadcastUtils.getShopTypeMap(spark, dt)
+    spark.udf.register("shop_type_mapping", func = (skuId: Long) => {
+      getSkuName.value.getOrElse(skuId,"")
+    })
+  }
+
+  def ordersStatusMapping(spark:SparkSession): Unit ={
+    spark.udf.register("orders_status_mapping", func = (skuId: String) => {
+      TypeUtils.map.getOrElse(skuId,"")
+    })
+  }
 }

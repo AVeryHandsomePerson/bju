@@ -322,3 +322,33 @@ tblproperties ("orc.compression"="snappy");
 
 ALTER TABLE ods_item_sku ADD IF NOT EXISTS PARTITION (dt='20210325') location '/user/hive/warehouse/ods.db/ods_item_sku/dt=20210325/';
 
+create external table ods.ods_item_category
+(
+    cid         string                   comment '类目id',
+    parent_cid  int                      comment '父级ID',
+    name        string                   comment '类目名称',
+    level       int                      comment '级别',
+    leaf        string                   comment '是否叶子节点',
+    sort_num    string                   comment '排序号',
+    status      int                      comment '类目级别',
+    channel     string                   comment '支持渠道  1:WAP  2:Web 3:APP',
+    sign        string                   comment '标记',
+    create_time string                   comment '创建日期',
+    update_time string                   comment '修改日期',
+    create_user bigint                  ,
+    update_user bigint                  ,
+    yn          int                      comment '1:有效;0:删除',
+    picture_url string                   comment '图片url',
+    platform    string                   comment '所属平台',
+    seller_code string                   comment '商家类目编码',
+    activity    string                   comment '参加活动：1、支持7天无理由退货，2、支持增值税专用票 逗号分隔',
+    rebate_flag int                      comment '是否设置商品交易扣点0:未设置 1:已设置  （只3级类目  一二级都为0）'
+)
+    comment '后台类目'
+PARTITIONED BY (
+  dt string
+)
+stored as orc
+location '/user/hive/warehouse/ods.db/ods_item_category'
+tblproperties ("orc.compression"="snappy");
+ALTER TABLE ods_item_category ADD IF NOT EXISTS PARTITION (dt='20210325') location '/user/hive/warehouse/ods.db/ods_item_category/dt=20210325/';

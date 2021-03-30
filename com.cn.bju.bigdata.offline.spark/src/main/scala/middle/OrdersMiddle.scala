@@ -13,7 +13,6 @@ object OrdersMiddle {
       .enableHiveSupport()
       .getOrCreate()
     val dt = new DateTime(args(0)).toString("yyyy-MM-dd")
-
     spark.sql(
       """
         |select
@@ -32,9 +31,7 @@ object OrdersMiddle {
         |dwd.fact_orders
         |where parent_order_id != 0
         |""".stripMargin).createOrReplaceTempView("orders")
-
     spark.sqlContext.cacheTable("orders")
-
     /**
      * 获取所有有效订单数据
      * 订单和订单明细是一对多
@@ -122,28 +119,7 @@ object OrdersMiddle {
          |from orders a left join t2 b
          |on a.order_id = b.order_id
          |""".stripMargin)
-   // 订单和商铺维度表
-    spark.sql(
-      """
-        |select
-        |a.shop_id,
-        |a.order_id,
-        |a.order_source,
-        |a.paid,
-        |c.industry,
-        |c.industry_name
-        |from
-        |orders a
-        |left join
-        |(select * from ods.shop_info) b
-        |on a.shop_id = b.shop_id
-        |left join
-        |(select * from ods.ods_plat_industry_rel) c
-        |on b.plat_industry_rel_id = c.id
-        |""".stripMargin).createOrReplaceTempView("dw_shop_order")
-
     //生成sku 信息和item 商城表 关联出 sku 和 商品名称总表 按天分区
-
     spark.sql(
       s"""
         |insert overwrite table dwd.dwd_sku_name
@@ -164,6 +140,35 @@ object OrdersMiddle {
         |ods.ods_item
         |) b
         |on a.item_id = b.item_id
+        |""".stripMargin)
+    //商品表维度数据拉宽
+    spark.sql(
+      s"""
+        |insert overwrite table dwd.dim_goods_cat partition(dt='20210325')
+        |select
+        |t3.cid as cat_3d_id,   --三级类目id
+        |t3.name as cat_3d_name,  --三级类目名称
+        |t2.cid as cat_2d_id,  --二级类目id
+        |t2.name as cat_2d_name, --二级类目名称
+        |t1.cid as cat_1t_id, --一级类目id
+        |t1.name as cat_1t_name --一级类目名称
+        |from
+        |(select
+        |*
+        |from ods.ods_item_category
+        |where level = 3 and  dt=$dt) t3
+        |left join
+        |(select
+        |*
+        |from ods.ods_item_category
+        |where level = 2 and  dt=$dt) t2
+        |on t3.parent_cid = t2.cid
+        |left join
+        |(select
+        |*
+        |from ods.ods_item_category
+        |where level = 1 and  dt=$dt) t1
+        |on t2.parent_cid = t1.cid
         |""".stripMargin)
 
 
