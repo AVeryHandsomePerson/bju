@@ -17,6 +17,88 @@ object OneGoodsAnalysis {
 
     //注册udf
     UDFRegister.skuMapping(spark,dt)
+
+
+    //商品和订单表关联
+//    spark.sql(
+//      s"""
+//         |select
+//         |a.shop_id,
+//         |b.paid
+//         |from
+//         |(
+//         |select
+//         |*
+//         |from ods.ods_item
+//         |) a
+//         |left join
+//         |(
+//         |select
+//         |* from
+//         |dwd.fact_orders
+//         |where parent_order_id != 0
+//         |-- and dt = $dt
+//         |) b
+//         |on a.shop_id = b.shop_id
+//         |""".stripMargin)
+    spark.sql(
+      s"""
+        |select
+        |t1.shop_id,
+        |t1.item_name,
+        |t1.shelve_time,
+        |t2.sku_id
+        |from
+        |(
+        |select
+        |*
+        |from
+        |ods.ods_item
+        |) t1
+        |left join
+        |(select
+        |*
+        |from
+        |ods.ods_item_sku
+        |where dt = $dt) t2
+        |on t1.item_id = t2.item_id and t1.shop_id = t2.shop_id
+      """.stripMargin).createOrReplaceTempView("a")
+
+    spark.sql(
+      """
+        |select
+        |t1.shop_id,
+        |t1.sku_id,
+        |t1.num,
+        |t2.shelve_time
+        |from
+        |(
+        |select
+        |*
+        |from dwd.dw_orders_merge_detail
+        |) t1
+        |left join
+        |a t2
+        |on t1.sku_id = t1.sku_id and t1.shop_id = t2.shop_id
+      """.stripMargin).createOrReplaceTempView("order_item")
+
+
+    spark.sql(
+      """
+        |select
+        |shop_id,
+        |sku_mapping(sku_id) as sku_name,
+        |sum(num)
+        |from
+        |dwd.dw_orders_merge_detail
+        |where sku_mapping(sku_id) !='' and shop_id = '2000000008'
+        |group by shop_id,sku_mapping(sku_id)
+        |order by sum(num) desc
+      """.stripMargin).show()
+
+
+
+
     //解析hdfs_page -- 需埋点
 //    spark.sql(
 //      """
@@ -120,6 +202,20 @@ object OneGoodsAnalysis {
 //      .write
 //      .mode(SaveMode.Append)
 //      .jdbc(StarvConfig.url,"order_sale_user",StarvConfig.properties)
+    //最新上架的前20商品数
+    spark.sql(
+      s"""
+        |select
+        |shelve_time,
+        |item_id,
+        |item_name
+        |from
+        |ods.ods_item
+        |-- where dt = $dt
+        |where shop_id = '2000000008'
+        |order by shelve_time desc
+      """.stripMargin)
+
 
     /**
      * 支付件数

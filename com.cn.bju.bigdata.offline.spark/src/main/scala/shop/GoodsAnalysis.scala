@@ -4,8 +4,9 @@ import common.StarvConfig
 import org.apache.commons.lang3.time.{DateFormatUtils, DateUtils}
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.joda.time.{DateTime, LocalDate}
-
 import java.util.Properties
+
+import udf.UDFRegister
 /**
  * @author ljh
  * @date 2021/3/23 14:29
@@ -22,20 +23,39 @@ object GoodsAnalysis {
       .getOrCreate()
     val dt = args(0)
     spark.sqlContext.cacheTable("dwd.dw_orders_merge_detail")
+    UDFRegister.shopMapping(spark,dt)
+
+
+
     //统计在架商品数据
-    spark.sql(
-      s"""
-        |select
-        |shop_id,
-        |count(1) as item_number,
-        |$dt as dt
-        |from dwd.fact_item
-        |where status = 4 and end_zipper_time = '9999-12-31'
-        |group by shop_id
-        |""".stripMargin)
-      .write
-      .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"goods_shelves",StarvConfig.properties)
+//    spark.sql(
+//      s"""
+//        |select
+//        |shop_id,
+//        |count(1) as item_number,
+//        |$dt as dt
+//        |from dwd.fact_item
+//        |where status = 4 and end_zipper_time = '9999-12-31'
+//        |group by shop_id
+//        |""".stripMargin)
+
+      spark.sql(
+        """
+          |select
+          |shop_id,
+          |shop_mapping(shop_id) as shop_name,
+          |count(distinct case when status = 4 then  item_id end) as item_number
+          |from
+          |ods.ods_item
+          |-- where dt = $dt
+          |group by shop_id
+        """.stripMargin).createOrReplaceTempView("shelf_goods_shelves")
+
+
+
+//      .write
+//      .mode(SaveMode.Append)
+//      .jdbc(StarvConfig.url,"goods_shelves",StarvConfig.properties)
 
     //解析hdfs_page
 //    spark.sql(
@@ -72,22 +92,27 @@ object GoodsAnalysis {
 //         |""".stripMargin).createOrReplaceTempView("goods_pv")
     //
     /**
-     *动销商品数
-     *有成交的商品的品种数，
+     *动销商品数 = 有成交的商品的品种数，
      *成交订单为当日付款当日未取消的在线支付订单，
      *或者当日下单当日未取消的货到付款订单。
      *下单客户数
      *下单笔数
      *下单商品件数
+     *成交商品件数
+     * 成交金额
+     *商品成交转化率 --需要埋点
      */
     spark.sql(
       s"""
-         |SELECT
+         |select
          |shop_id,
-         |count(distinct sku_id) as var_number,
+         |shop_mapping(shop_id) as shop_name,
+         |count(distinct case when paid = 2 then sku_id end) as sale_number,
          |count(distinct buyer_id) as sale_user_number,
          |count(distinct order_id) as sale_number,
          |round(sum(case when num is null then 0 else num end ),2) as sale_goods_number,
+         |round(sum(case when paid = 2 and refund = 0 then num end),2) as sale_succeed_number,
+         |round(sum(case when paid = 2 and refund = 0 then payment_total_money end),2) as sale_succeed_money,
          |$dt as dt
          |from
          |dwd.dw_orders_merge_detail
@@ -233,7 +258,7 @@ object GoodsAnalysis {
 
 
     /**
-     * 商品成交转化率
+     * 商品成交转化率   --需要埋点
      * 1.统计出商品访问数
      * 2.统计出成交客户数
      * 3.成交客户数/商品访问数
