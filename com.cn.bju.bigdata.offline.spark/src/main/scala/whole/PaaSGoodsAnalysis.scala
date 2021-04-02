@@ -10,7 +10,7 @@ import utils.BroadcastUtils
  * @date 2021/3/29 9:36
  * @version 1.0
  */
-object ShopGoodsAnalysis {
+object PaaSGoodsAnalysis {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder()
       .appName("DealAnlysis")
@@ -121,28 +121,60 @@ object ShopGoodsAnalysis {
          |) t3
          |on t2.cid = t3.cat_3d_id
          |""".stripMargin).createOrReplaceTempView("shop_cid")
-    //商品和订单表关联
+    /**
+     *-------------------------------商品数据分析
+     * */
+    //商品销售情况
     spark.sql(
       s"""
          |select
-         |a.shop_id,
-         |b.paid
+         |sku_id,
+         |sku_mapping(sku_id) as sku_name,
+         |sum(case when paid = 2 and refund = 0 then payment_total_money end) as sale_succeed_money,
+         |count(case when paid = 2 and refund = 0 then 1 end) as orders_succeed_number, --销量
+         |sum(case when paid = 2 and refund = 0 then num end) as sale_order_number, -- 总销售额
+         |count(distinct case when paid = 2 and refund = 0 then buyer_id end)  as sale_user_number --支付人数
          |from
-         |(
-         |select
-         |*
-         |from ods.ods_item
-         |) a
-         |left join
-         |(
-         |select
-         |* from
-         |dwd.fact_orders
-         |where parent_order_id != 0
-         |-- and dt = $dt
-         |) b
-         |on a.shop_id = b.shop_id
-         |""".stripMargin)
+         |order
+         |group by sku_id
+         |""".stripMargin).createOrReplaceTempView("shop_all_money")
+    //商品信息展示
+    spark.sql(
+      s"""
+        |select
+        |t1.sku_id,
+        |t1.item_name,
+        |concat(t3.cat_3d_name,'/',t3.cat_2d_name,'/',t3.cat_1t_name) as cat_name, -- 分类
+        |orders_status_mapping(t1.status) as status, -- 状态
+        |case when t2.orders_succeed_number is null then 0
+        |else t2.orders_succeed_number end orders_succeed_number,--销量
+        |case when t2.sale_order_number is null then 0
+        |else t2.sale_order_number end sale_order_number, --总销售额
+        |case when t2.sale_succeed_money is null then 0 else t2.sale_succeed_money
+        |end as sale_succeed_money, --成交金额
+        |case when round(t2.sale_succeed_money/t2.sale_user_number,2) is not null
+        |then round(t2.sale_succeed_money/t2.sale_user_number,2)
+        |else 0 end as money, --客单价
+        |$dt as dt
+        |from
+        |dwd.dwd_sku_name t1
+        |left join
+        |shop_all_money t2
+        |on t1.sku_id = t2.sku_id
+        |left join
+        |(select * from dwd.dim_goods_cat where dt=$dt) t3
+        |on t1.cid = t3.cat_3d_id
+        |order by orders_succeed_number desc
+        |""".stripMargin)
+      .write
+      .mode(SaveMode.Append)
+      .jdbc(properties.get("url").toString(),"platform_goods_info",properties)
+//      .write
+//      .mode(SaveMode.Append)
+//      .jdbc(StarvConfig.url,"goods_sale",StarvConfig.properties)
+
+
+
     /**
      *-------------------------------商品单品分析
      *下单笔数
@@ -170,7 +202,6 @@ object ShopGoodsAnalysis {
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url,"goods_sale",StarvConfig.properties)
-
     //------------------------平台订单分布
     //平台订单信息
     spark.sql(

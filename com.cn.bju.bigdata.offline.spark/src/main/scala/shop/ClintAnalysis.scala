@@ -3,6 +3,7 @@ package shop
 import common.StarvConfig
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.joda.time.DateTime
+import udf.UDFRegister
 import utils.BroadcastUtils
 
 object ClintAnalysis {
@@ -15,6 +16,17 @@ object ClintAnalysis {
       .getOrCreate()
 
     val dt = args(0)
+    UDFRegister.clientMapping(spark, dt)
+
+
+    spark.sql(
+      """
+        |select
+        |*
+        |from
+        |dwd.dw_orders_merge_detail
+        |""".stripMargin).createOrReplaceTempView("orders_merge_detail")
+    spark.sqlContext.cacheTable("orders_merge_detail")
 
     /**
      * 客户数-- 店铺维度:
@@ -26,7 +38,6 @@ object ClintAnalysis {
      * 新成交客户占比：筛选时间新成交客户数 / 全部成交客户数
      * 老成交客户占比：筛选时间老成交客户数 / 全部成交客户数
      */
-
     spark.sql(
       """
         |select
@@ -59,10 +70,27 @@ object ClintAnalysis {
         |then buyer_id end) as new_user_dis_number -- 当天成交的新用户数
         |from
         |order_tmp
-        |where present_day = 1
+        |-- where present_day = 1
         |group by shop_id,order_type
         |""".stripMargin).createOrReplaceTempView("client_order_type")
-    //分平台
+    //全平台
+    spark.sql(
+      """
+        |select
+        |shop_id,
+        |count(distinct buyer_id)  user_dis_number, --累计所有的成交用户数
+        |count(distinct case when present_day = 1 then buyer_id end) as
+        |present_user_dis_number, --当天成交的用户数
+        |count(distinct case when flag_years = 1 and present_day = 1
+        |then buyer_id end) as aged_user_dis_number, -- 当天成交的老用户数
+        |count(distinct case when  flag_years = 1 and present_day = 1
+        |then buyer_id end) as new_user_dis_number -- 当天成交的新用户数
+        |from
+        |order_tmp
+        |-- where present_day = 1
+        |group by shop_id
+        |""".stripMargin).createOrReplaceTempView("client_order_tmp")
+
     spark.sql(
       s"""
         |select
@@ -78,32 +106,10 @@ object ClintAnalysis {
         |$dt as dt
         |from
         |client_order_type
-        |""".stripMargin)
-      .write
-      .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"client_sale_analysis_type",StarvConfig.properties)
-    //全平台
-    spark.sql(
-      """
-        |select
-        |shop_id,
-        |count(distinct buyer_id)  user_dis_number, --累计所有的成交用户数
-        |count(distinct case when present_day = 1 then buyer_id end) as
-        |present_user_dis_number, --当天成交的用户数
-        |count(distinct case when flag_years = 1 and present_day = 1
-        |then buyer_id end) as aged_user_dis_number, -- 当天成交的老用户数
-        |count(distinct case when  flag_years = 1 and present_day = 1
-        |then buyer_id end) as new_user_dis_number -- 当天成交的新用户数
-        |from
-        |order_tmp
-        |where present_day = 1
-        |group by shop_id
-        |""".stripMargin).createOrReplaceTempView("client_order_tmp")
-    //全平台
-    spark.sql(
-      s"""
+        |""".stripMargin).union(spark.sql(s"""
          |select
          |shop_id,
+         |'all' as order_type,
          |user_dis_number,
          |present_user_dis_number,
          |aged_user_dis_number,
@@ -114,11 +120,13 @@ object ClintAnalysis {
          |$dt as dt
          |from
          |client_order_tmp
-         |""".stripMargin)
+         |""".stripMargin))
+//      .write
+//      .mode(SaveMode.Append)
+//      .jdbc(properties.get("url").toString(), "shop_client_analysis", properties)
       .write
       .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"client_sale_analysis",StarvConfig.properties)
-
+      .jdbc(StarvConfig.url,"shop_client_analysis",StarvConfig.properties)
 
     /**
      *
@@ -128,12 +136,9 @@ object ClintAnalysis {
      * 老成交客户-访问-支付转化率：老成交客户数/店铺访客数中近1年购买过的访客数
      */
 
-    val userMap = BroadcastUtils.getUserMap(spark, dt)
-    spark.udf.register("user_mapping", func = (userId: Long) => {
-      userMap.value.getOrElse(userId,"")
-    })
+
     /**
-     * 统计客户采购额，按购买次后金额排名统计
+     * 统计分平台客户采购额，按购买次后金额排名统计
      */
     spark.sql(
       s"""
@@ -145,7 +150,7 @@ object ClintAnalysis {
          |payment_total_money,
          |payment_total_money - (num * cost_price) as profit
          |from
-         |dwd.dw_orders_merge_detail
+         |orders_merge_detail
          |where paid = 2 and refund = 0
          |),
          |t2 as(
@@ -182,7 +187,53 @@ object ClintAnalysis {
          |from
          |t3
          |where profit_top <=10
-         |""".stripMargin)
+         |""".stripMargin).union(spark.sql(s"""
+         |with t1 as(
+         |select
+         |shop_id,
+         |buyer_id,
+         |payment_total_money,
+         |payment_total_money - (num * cost_price) as profit
+         |from
+         |orders_merge_detail
+         |where paid = 2 and refund = 0
+         |),
+         |t2 as(
+         |select
+         |shop_id,
+         |buyer_id,
+         |case when round(sum(profit),2)  is null
+         |then 0 else round(sum(profit),2) end as sale_succeed_profit,
+         |case when round(sum(payment_total_money),2) is null
+         |then 0 else round(sum(payment_total_money),2)
+         |end as sale_succeed_money
+         |from
+         |t1
+         |group by shop_id,buyer_id
+         |),t3 as (
+         |select
+         |shop_id,
+         |user_mapping(buyer_id) as user_name,
+         |sale_succeed_money,
+         |sale_succeed_profit,
+         |row_number() over(partition by shop_id,buyer_id order by sale_succeed_money desc) as profit_top
+         |from
+         |t2
+         |)
+         |select
+         |shop_id,
+         |'all' as order_type,
+         |user_name,
+         |sale_succeed_money,
+         |sale_succeed_profit,
+         |$dt as dt
+         |from
+         |t3
+         |where profit_top <=10
+         |""".stripMargin))
+//      .write
+//      .mode(SaveMode.Append)
+//      .jdbc(properties.get("url").toString(), "shop_client_sale_top", properties)
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url,"client_sale_top",StarvConfig.properties)
@@ -200,7 +251,7 @@ object ClintAnalysis {
          |count(distinct buyer_id) as sale_user_count,
          |round(sum(payment_total_money),2) as sale_succeed_money
          |from
-         |dwd.dw_orders_merge_detail
+         |orders_merge_detail
          |where paid = 2 and refund = 0
          |group by shop_id,order_type,province_name
          |),
@@ -225,7 +276,6 @@ object ClintAnalysis {
          |$dt as dt
          |from
          |t2
-         |where money_top <=15
          |""".stripMargin)
       .write
       .mode(SaveMode.Append)

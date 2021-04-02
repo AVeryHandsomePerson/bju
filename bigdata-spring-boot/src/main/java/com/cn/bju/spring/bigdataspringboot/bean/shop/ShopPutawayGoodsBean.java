@@ -7,7 +7,7 @@ import java.util.Date;
  * @version 1.0
  * @date 2021/3/23 17:12
  */
-public class GoodsShelvesBean {
+public class ShopPutawayGoodsBean {
 
     private Integer shopId;
     private Integer itemNumber;

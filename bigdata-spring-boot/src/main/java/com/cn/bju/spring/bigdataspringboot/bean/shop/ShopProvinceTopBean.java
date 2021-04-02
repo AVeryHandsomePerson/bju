@@ -5,13 +5,16 @@ package com.cn.bju.spring.bigdataspringboot.bean.shop;
  * @version 1.0
  * @date 2021/3/24 10:33
  */
-public class GoodsProvinceTopBean {
-    private Integer shopId;
-    private String provinceName;
-    private  Integer saleUserCount;
-    private  Integer saleSucceedMoney;
-    private  Double saleRatio;
-    private  String dt;
+public class ShopProvinceTopBean {
+  private Integer shopId;
+  private String shopName;
+  private String orderType;
+  private String provinceName;
+  private Integer saleUserCount;
+  private Double saleSucceedMoney;
+  private Double saleRatio;
+  private String dt;
+
 
     public Integer getShopId() {
         return shopId;
@@ -19,6 +22,22 @@ public class GoodsProvinceTopBean {
 
     public void setShopId(Integer shopId) {
         this.shopId = shopId;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 
     public String getProvinceName() {
@@ -37,11 +56,11 @@ public class GoodsProvinceTopBean {
         this.saleUserCount = saleUserCount;
     }
 
-    public Integer getSaleSucceedMoney() {
+    public Double getSaleSucceedMoney() {
         return saleSucceedMoney;
     }
 
-    public void setSaleSucceedMoney(Integer saleSucceedMoney) {
+    public void setSaleSucceedMoney(Double saleSucceedMoney) {
         this.saleSucceedMoney = saleSucceedMoney;
     }
 
@@ -63,8 +82,10 @@ public class GoodsProvinceTopBean {
 
     @Override
     public String toString() {
-        return "GoodsPriovinceTopBean{" +
+        return "GoodsProvinceTopBean{" +
                 "shopId=" + shopId +
+                ", shopName='" + shopName + '\'' +
+                ", orderType='" + orderType + '\'' +
                 ", provinceName='" + provinceName + '\'' +
                 ", saleUserCount=" + saleUserCount +
                 ", saleSucceedMoney=" + saleSucceedMoney +

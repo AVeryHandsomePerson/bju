@@ -5,7 +5,7 @@ package com.cn.bju.spring.bigdataspringboot.bean.shop;
  * @version 1.0
  * @date 2021/3/24 10:31
  */
-public class GoodsProfitTopBean {
+public class ShopGoodsProfitTopBean {
     private Integer shopId;
     private String itemName;
     private  Integer saleUserCount;

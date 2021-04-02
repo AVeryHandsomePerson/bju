@@ -119,17 +119,35 @@ create table shop_cat_number
 
 create table platform_cat_number
 (
-    item_number integer comment '1级类目',
+    item_number       integer comment '1级类目',
     shelf_item_number integer comment '2级类目',
-    sale_number integer comment '3级类目',
-    dt            date not null
+    sale_number       integer comment '3级类目',
+    dt                date not null
 ) comment '平台级-商家商品数据-商品总数' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 create table shop_goods_number
-(   shop_id       integer comment '店铺ID',
-    shop_name     varchar(100) comment '店铺名称',
-    item_number integer comment '1级类目',
+(
+    shop_id           integer comment '店铺ID',
+    shop_name         varchar(100) comment '店铺名称',
+    item_number       integer comment '1级类目',
     shelf_item_number integer comment '2级类目',
-    sale_number integer comment '3级类目',
-    dt            date not null
+    sale_number       integer comment '3级类目',
+    dt                date not null
 ) comment '平台级-商家商品数据-商品总数' ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+create table platform_goods_info
+(
+    id                    integer  PRIMARY KEY AUTO_INCREMENT comment 'id',
+    sku_id                integer comment 'sku_id',
+    item_name             varchar(100) comment '商品名称',
+    cat_name              varchar(100) comment '分类',
+    status                varchar(50) comment '状态',
+    orders_succeed_number bigint comment '销量',
+    sale_order_number     double comment '总销售额',
+    sale_succeed_money    double comment '成交金额',
+    money                 double comment '客单价',
+    dt                    date not null
+) comment '商品数据分析'  AUTO_INCREMENT = 100  ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

@@ -19,7 +19,6 @@ object ZipperTable {
     val yesterDayDateTime = new DateTime(DateUtils.parseDate(dt, "yyyyMMdd")).minusDays(1).toString("yyyy-MM-dd")
     /**
      * 订单拉链表
-     *
      */
     spark.sql(
       s"""
@@ -114,6 +113,7 @@ object ZipperTable {
         |a.dt
         |from
         |dwd.fact_orders a
+        |-- 订单表过期时间
         |left join
         |oders_tmp b
         |on a.order_id = b.order_id
@@ -199,161 +199,165 @@ object ZipperTable {
         |from
         |oders_tmp
         |""".stripMargin)
+
+
+
+
     /**
-     * 商品
+     * 商品 --暂时去除
      */
-    spark.sql(
-      s"""
-         |select
-         |*
-         |from
-         |ods.ods_item
-         |where dt =$dt
-         |""".stripMargin).createOrReplaceTempView("item_tmp")
-    spark.sql(
-      s"""
-        |insert overwrite table dwd.fact_item
-        |select
-        |a.item_id                 ,
-        |a.brand_id                ,
-        |a.cid                     ,
-        |a.seller_id               ,
-        |a.shop_id                 ,
-        |a.shop_cid                ,
-        |a.shop_freight_template_id,
-        |a.attributes              ,
-        |a.attr_sale               ,
-        |a.status                  ,
-        |a.type                    ,
-        |a.item_name               ,
-        |a.shelve_time             ,
-        |a.off_shelve_time         ,
-        |a.task_shelve_time        ,
-        |a.task_off_shelve_time    ,
-        |a.origin                  ,
-        |a.weight                  ,
-        |a.volume                  ,
-        |a.length                  ,
-        |a.width                   ,
-        |a.height                  ,
-        |a.ad                      ,
-        |a.keyword                 ,
-        |a.remark                  ,
-        |a.unit_code               ,
-        |a.unit_name               ,
-        |a.quotation_way           ,
-        |a.create_time             ,
-        |a.create_user             ,
-        |a.update_time             ,
-        |a.update_user             ,
-        |a.yn                      ,
-        |a.sign                    ,
-        |a.status_change_reason    ,
-        |a.platform                ,
-        |a.give_away               ,
-        |a.pay_type                ,
-        |a.sale_channel            ,
-        |a.points                  ,
-        |a.upc                     ,
-        |a.goods_code              ,
-        |a.attr_template_id        ,
-        |a.`describe`              ,
-        |a.ad_url                  ,
-        |a.source_item_id          ,
-        |a.master_item_id          ,
-        |a.rebate_flag             ,
-        |a.shop_sales_terr_temp_id ,
-        |a.create_zipper_time,
-        |case when b.order_id is not null and a.end_zipper_time = '9999-12-31'
-        |then '$yesterDayDateTime' else a.end_zipper_time  end as end_zipper_time,
-        |a.dt
-        |from
-        |dwd.fact_item a
-        |left join
-        |item_tmp b
-        |on a.item_id = b.item_id
-        |union all
-        |select
-        |order_id                ,
-        |parent_order_id         ,
-        |order_type              ,
-        |status                  ,
-        |buyer_status            ,
-        |seller_type             ,
-        |order_platform          ,
-        |order_source            ,
-        |total_money             ,
-        |freight_money           ,
-        |discount_money          ,
-        |cut_money               ,
-        |other_fee               ,
-        |round_down              ,
-        |actually_payment_money  ,
-        |buyer_id                ,
-        |buyer_name              ,
-        |buyer_shop_id           ,
-        |buyer_shop_name         ,
-        |seller_id               ,
-        |seller_name             ,
-        |shop_id                 ,
-        |shop_name               ,
-        |`option`                ,
-        |paid                    ,
-        |payment_source          ,
-        |payment_time            ,
-        |refund                  ,
-        |`exchange`                ,
-        |invoice                 ,
-        |buyer_memo              ,
-        |seller_memo             ,
-        |is_change_price         ,
-        |settle_flag             ,
-        |evaluation              ,
-        |create_time             ,
-        |modify_time             ,
-        |create_user             ,
-        |modify_user             ,
-        |deposit                 ,
-        |retainage               ,
-        |retainage_order_id      ,
-        |presell_id              ,
-        |presell_pay_type        ,
-        |order_credit            ,
-        |yn                      ,
-        |manage_user_id          ,
-        |manage_username         ,
-        |buyer_manage_user_id    ,
-        |buyer_manage_username   ,
-        |purchase_date           ,
-        |warehouse_code          ,
-        |warehouse_name          ,
-        |reason                  ,
-        |audit_time              ,
-        |audit_user_id           ,
-        |audit_username          ,
-        |remark                  ,
-        |seller_org_code         ,
-        |seller_org_parent_code  ,
-        |buyer_org_code          ,
-        |buyer_org_parent_code   ,
-        |delivery_type           ,
-        |print_price             ,
-        |consignment             ,
-        |store_complete          ,
-        |balance_amount          ,
-        |balance_flag            ,
-        |issue_flag              ,
-        |self_pick_flag          ,
-        |expect_receive_time     ,
-        |delivery_remark         ,
-        |case when update_time is not null
-        |then to_date(update_time) else to_date(create_time)
-        |end as create_zipper_time,
-        |'9999-12-31' as end_zipper_time,
-        |date_format(create_time,'yyyyMMdd')
-        |from
-        |item_tmp
-        |""".stripMargin)
+//    spark.sql(
+//      s"""
+//         |select
+//         |*
+//         |from
+//         |ods.ods_item
+//         |where dt =$dt
+//         |""".stripMargin).createOrReplaceTempView("item_tmp")
+//    spark.sql(
+//      s"""
+//        |insert overwrite table dwd.fact_item
+//        |select
+//        |a.item_id                 ,
+//        |a.brand_id                ,
+//        |a.cid                     ,
+//        |a.seller_id               ,
+//        |a.shop_id                 ,
+//        |a.shop_cid                ,
+//        |a.shop_freight_template_id,
+//        |a.attributes              ,
+//        |a.attr_sale               ,
+//        |a.status                  ,
+//        |a.type                    ,
+//        |a.item_name               ,
+//        |a.shelve_time             ,
+//        |a.off_shelve_time         ,
+//        |a.task_shelve_time        ,
+//        |a.task_off_shelve_time    ,
+//        |a.origin                  ,
+//        |a.weight                  ,
+//        |a.volume                  ,
+//        |a.length                  ,
+//        |a.width                   ,
+//        |a.height                  ,
+//        |a.ad                      ,
+//        |a.keyword                 ,
+//        |a.remark                  ,
+//        |a.unit_code               ,
+//        |a.unit_name               ,
+//        |a.quotation_way           ,
+//        |a.create_time             ,
+//        |a.create_user             ,
+//        |a.update_time             ,
+//        |a.update_user             ,
+//        |a.yn                      ,
+//        |a.sign                    ,
+//        |a.status_change_reason    ,
+//        |a.platform                ,
+//        |a.give_away               ,
+//        |a.pay_type                ,
+//        |a.sale_channel            ,
+//        |a.points                  ,
+//        |a.upc                     ,
+//        |a.goods_code              ,
+//        |a.attr_template_id        ,
+//        |a.`describe`              ,
+//        |a.ad_url                  ,
+//        |a.source_item_id          ,
+//        |a.master_item_id          ,
+//        |a.rebate_flag             ,
+//        |a.shop_sales_terr_temp_id ,
+//        |a.create_zipper_time,
+//        |case when b.order_id is not null and a.end_zipper_time = '9999-12-31'
+//        |then '$yesterDayDateTime' else a.end_zipper_time  end as end_zipper_time,
+//        |a.dt
+//        |from
+//        |dwd.fact_item a
+//        |left join
+//        |item_tmp b
+//        |on a.item_id = b.item_id
+//        |union all
+//        |select
+//        |order_id                ,
+//        |parent_order_id         ,
+//        |order_type              ,
+//        |status                  ,
+//        |buyer_status            ,
+//        |seller_type             ,
+//        |order_platform          ,
+//        |order_source            ,
+//        |total_money             ,
+//        |freight_money           ,
+//        |discount_money          ,
+//        |cut_money               ,
+//        |other_fee               ,
+//        |round_down              ,
+//        |actually_payment_money  ,
+//        |buyer_id                ,
+//        |buyer_name              ,
+//        |buyer_shop_id           ,
+//        |buyer_shop_name         ,
+//        |seller_id               ,
+//        |seller_name             ,
+//        |shop_id                 ,
+//        |shop_name               ,
+//        |`option`                ,
+//        |paid                    ,
+//        |payment_source          ,
+//        |payment_time            ,
+//        |refund                  ,
+//        |`exchange`                ,
+//        |invoice                 ,
+//        |buyer_memo              ,
+//        |seller_memo             ,
+//        |is_change_price         ,
+//        |settle_flag             ,
+//        |evaluation              ,
+//        |create_time             ,
+//        |modify_time             ,
+//        |create_user             ,
+//        |modify_user             ,
+//        |deposit                 ,
+//        |retainage               ,
+//        |retainage_order_id      ,
+//        |presell_id              ,
+//        |presell_pay_type        ,
+//        |order_credit            ,
+//        |yn                      ,
+//        |manage_user_id          ,
+//        |manage_username         ,
+//        |buyer_manage_user_id    ,
+//        |buyer_manage_username   ,
+//        |purchase_date           ,
+//        |warehouse_code          ,
+//        |warehouse_name          ,
+//        |reason                  ,
+//        |audit_time              ,
+//        |audit_user_id           ,
+//        |audit_username          ,
+//        |remark                  ,
+//        |seller_org_code         ,
+//        |seller_org_parent_code  ,
+//        |buyer_org_code          ,
+//        |buyer_org_parent_code   ,
+//        |delivery_type           ,
+//        |print_price             ,
+//        |consignment             ,
+//        |store_complete          ,
+//        |balance_amount          ,
+//        |balance_flag            ,
+//        |issue_flag              ,
+//        |self_pick_flag          ,
+//        |expect_receive_time     ,
+//        |delivery_remark         ,
+//        |case when update_time is not null
+//        |then to_date(update_time) else to_date(create_time)
+//        |end as create_zipper_time,
+//        |'9999-12-31' as end_zipper_time,
+//        |date_format(create_time,'yyyyMMdd')
+//        |from
+//        |item_tmp
+//        |""".stripMargin)
 
     /**
      * 订单收货拉链表
@@ -437,12 +441,12 @@ object ZipperTable {
          |select
          |*
          |from
-         |ods.ods_orders_receive
+         |ods.ods_refund_details
          |where dt =$dt
-         |""".stripMargin).createOrReplaceTempView("ods_refund_detail_tmp")
+         |""".stripMargin).createOrReplaceTempView("ods_refund_details_tmp")
     spark.sql(
       s"""
-         |insert overwrite table dwd.fact_refund_detail
+         |insert overwrite table dwd.fact_refund_details
          |select
          |a.id                ,
          |a.refund_id         ,
@@ -516,7 +520,6 @@ object ZipperTable {
          |from
          |ods_orders_receive_tmp
          |""".stripMargin)
-
     /**
      * 订单退货拉链表
      */
@@ -530,7 +533,7 @@ object ZipperTable {
          |""".stripMargin).createOrReplaceTempView("ods_refund_apply_tmp")
     spark.sql(
       s"""
-         |insert overwrite table dwd.fact_refund_detail
+         |insert overwrite table dwd.fact_refund_apply
          |select
          |a.id,
          |a.refund_no,

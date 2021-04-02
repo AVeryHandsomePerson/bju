@@ -26,6 +26,7 @@ object OrdersMiddle {
         |order_source,
         |payment_time,
         |status,
+        |actually_payment_money,
         |seller_id
         |from
         |dwd.fact_orders
@@ -65,6 +66,7 @@ object OrdersMiddle {
          |a.create_time,
          |a.payment_time,
          |a.status,
+         |a.order_source,
          |b.num,
          |b.sku_id,
          |b.item_name,
@@ -79,44 +81,70 @@ object OrdersMiddle {
          |left join t3 c
          |on a.order_id = c.order_id
          |""".stripMargin)
-    //生成 退货表  后续获取当天分区的
+    //获取 退货表 退货明细表 后续获取当天分区的
     spark.sql(
       """
         |select
         |id,
         |order_id,
-        |create_time,
         |refund_status,
-        |modify_time,
-        |refund_total_money as refund_money
+        |refund_reason,
+        |modify_time
         |from dwd.fact_refund_apply
-        |""".stripMargin).createOrReplaceTempView("refund_tmp")
-    //订单关联退货表 存在1对多
+        |""".stripMargin).createOrReplaceTempView("refund_apply")
+    spark.sql(
+      """
+        |select
+        |id,
+        |refund_id,
+        |create_time,
+        |sku_id,
+        |refund_num,
+        |refund_price
+        |from dwd.fact_refund_details
+        |""".stripMargin).createOrReplaceTempView("refund_detail")
+
+    //退货表和退货明细表合并
+     spark.sql(
+       """
+         |select
+         |a.id,
+         |a.order_id,
+         |a.refund_status,
+         |a.refund_reason,
+         |a.modify_time,
+         |b.create_time,
+         |b.refund_id,
+         |b.sku_id,
+         |b.refund_num * b.refund_price as refund_money
+         |from
+         |refund_apply a
+         |left join
+         |refund_detail b
+         |on a.id = b.refund_id
+         |""".stripMargin).createOrReplaceTempView("refund_tmp")
+    //退货表关联订单 存在1对多
     spark.sql(
       s"""
-         |with
-         |t2 as (select
-         |id,
-         |order_id,
-         |create_time,
-         |refund_status,
-         |modify_time,
-         |refund_money
-         |from refund_tmp
-         |)
          |insert overwrite table dwd.dw_refund_orders
          |select
-         |a.shop_id,
-         |a.order_type,
-         |a.buyer_id,
-         |b.refund_status,
-         |a.order_id,
-         |a.paid,
-         |b.id,
-         |b.create_time,
-         |b.modify_time,
-         |b.refund_money
-         |from orders a left join t2 b
+         |a.id,
+         |a.create_time,
+         |a.modify_time,
+         |a.refund_reason,
+         |a.refund_money,
+         |a.sku_id,
+         |b.shop_id,
+         |b.order_type,
+         |b.buyer_id,
+         |b.refund,
+         |a.refund_status,
+         |b.order_id,
+         |b.paid,
+         |b.actually_payment_money
+         |from refund_tmp a
+         |left join
+         |orders b
          |on a.order_id = b.order_id
          |""".stripMargin)
     //生成sku 信息和item 商城表 关联出 sku 和 商品名称总表 按天分区
@@ -125,7 +153,9 @@ object OrdersMiddle {
         |insert overwrite table dwd.dwd_sku_name
         |select
         |a.sku_id,
-        |b.item_name
+        |b.item_name,
+        |a.status,
+        |b.cid
         |from
         |(select
         |*
@@ -144,7 +174,7 @@ object OrdersMiddle {
     //商品表维度数据拉宽
     spark.sql(
       s"""
-        |insert overwrite table dwd.dim_goods_cat partition(dt='20210325')
+        |insert overwrite table dwd.dim_goods_cat partition(dt=$dt)
         |select
         |t3.cid as cat_3d_id,   --三级类目id
         |t3.name as cat_3d_name,  --三级类目名称

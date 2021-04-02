@@ -1,115 +1,149 @@
 # 接口
-## /getShelves?shopId=2000000126&dt=2021-03-22
-查询在架品商品
+## 1. /getShelves
+?shopId=2000000027&dt=2021-03-25
+
+表名:putaway_goods
 
 包含指标：
 
 ```
-在架商品数据
+item_number 在架商品数
 ```
 
-表名：goods_shelves
+## 2. /getSale
+?shopId=2000000027&dt=2021-03-25
 
-| shop_id | item_number | dt   |
-| ------- | ----------- | ---- |
-| 商铺ID  | 在架商品数  | 时间 |
-
-## /getSale?shopId=2000000081&dt=2021-03-22
-查询商品品种数，商品客户数，下单商品件数
+表名:shop_goods_sale
 
 包含指标：
 
 ```
-动销商品数:
-有成交的商品的品种数，成交订单为当日付款当日未取消的在线支付订单，或者当日下单当日未取消的货到付款订单。
-下单客户数
-下单笔数
-下单商品件数
+shop_id
+shop_name
+sale_number 动销商品数 = 有成交商品的品种数
+sale_user_number 下单客户数
+sale_number 下单笔数
+sale_goods_number 下单商品件数
+sale_succeed_number 成交商品件数
+sale_succeed_money 成交金额
+goods_transform_ratio 商品转换率 --需要埋点目前为00
 ```
 
-表名：goods_sale
 
-| shop_id | var_number | sale_user_number | sale_goods_number | sale_number | dt   |
-| ------- | ---------- | ---------------- | ----------------- | ----------- | ---- |
-| 商铺ID  | 动销商品数 | 下单客户数       | 下单件数          | 下单笔数    | 时间 |
 
-## /getClientPrice
+## 3. /getClientPrice 修改为 /getSaleInfo
+
 * 接口传参：
 
    1. 全平台：
 
-      ?shopId=2000000008&dt=2021-03-25
+      ?shopId=2000000085&dt=2021-03-25
 
    2. 区分平台：
 
-      ?shopId=2000000081&dt=2021-03-22&type=TB 
+      ?shopId=2000000085&dt=2021-03-22&type=TB 
 
-      
+      or
 
-      包含指标：
+      ?shopId=2000000085&dt=2021-03-25&type=TC
 
-      ```
-      客单价
-      ```
+包含指标：
 
-| shop_id | money | dt   |
-| ------- | ----- | ---- |
-| 商铺ID  | 价钱  | 时间 |
+```
+    shop_id              
+    order_type            
+    sale_user_number       '成交客户数' = 支付人数
+    orders_succeed_number  '成交单量' =支付订单数
+    sale_order_number      '下单笔数'
+    sale_succeed_money     '成交金额' = 本店收款的支付金额
+    money                  '客单价'
+```
 
-## /getMoneyTop?shopId=2000000081&dt=2021-03-22
+## 4. /getMoneyTop
+
+?shopId=2000000027&dt=2021-03-25
+
 商品金额TOP
 
+表名:shop_goods_money_top
+
 包含指标：
 
 ```
-统计支付人数
-统计支付金额
-统计支付金额占总支付金额比例
+sale_user_count 统计支付人数
+sale_succeed_money 统计支付金额
+sale_ratio 统计支付金额占总支付金额比例
 ```
 
-| shop_id | item_name | sale_user_count | sale_succeed_money | sale_ratio | dt   |
-| ------- | --------- | --------------- | ------------------ | ---------- | ---- |
-| 商铺ID  | 商品名称  | 下单数量        | 成交金额           | 金额占比   | 时间 |
+## 5. /getProfitTop
+?shopId=2000000027&dt=2021-03-25
 
-## /getProfitTop?shopId=2000000081&dt=2021-03-22
 商品利润TOP
 
-表名:goods_profit_top
+表名:shop_goods_profit_top
 
 包含指标：
 
 ```
-访问人数
-成交利润
-利润占比
+sale_user_count 支付人数
+sale_succeed_profit 成交利润
+sale_profit_ratio 利润占比
 ```
 
-| shop_id | item_name | sale_user_count | sale_succeed_profit | sale_profit_ratio | dt   |
-| ------- | --------- | --------------- | ------------------- | ----------------- | ---- |
-| 商铺ID  | 商品名称  | 下单数量        | 成交利润            | 利润占比          | 时间 |
 
-## /getProvinceTop
+
+
+
+## 6. /getProvince
+
 * 接口传参：
 
    1. 全平台：
 
-      ?shopId=2000000081&dt=2021-03-22 
+      ?shopId=2000000008&dt=2021-03-25 
 
    2. 区分平台：
 
-      ?shopId=2000000012&dt=2021-03-25&type=TB
+      ?shopId=2000000008&dt=2021-03-25&type=TB
 
 包含指标：
 
-商品省份TOP
+```
+province_name --省份
+```
 
-shop_id 商铺ID
 
-| shop_id | province_name | sale_user_count | sale_succeed_money | sale_ratio   | dt   |
-| ------- | ------------- | --------------- | ------------------ | ------------ | ---- |
-| 商铺ID  | 省份名称      | 支付人数        | 支付金额           | 支付金额比例 | 时间 |
 
-## /getSalSuc
+## 7. /getProvinceTop
+
+* 接口传参：
+
+  1. 全平台：
+
+     ?shopId=2000000008&dt=2021-03-25 
+
+  2. 区分平台：
+
+     ?shopId=2000000008&dt=2021-03-25&type=TB
+
+包含指标：
+
+```
+shop_id   --商铺id
+shop_name --商铺名称
+order_type --渠道
+province_name --省份
+sale_user_count -- 支付人数
+sale_succeed_money --支付金额
+sale_ratio -- 支付比例
+```
+
+
+
+
+
+## 8. /getSalSuc --删除
+
 * 接口传参：
 
    1. 全平台：
@@ -142,36 +176,102 @@ shop_id 商铺ID
 | ------- | ------------------- | --------------------- | ---------------- | ------------------ | ---- |
 | 商铺ID  | 成交商品件数        | 成交单量              | 支付人数         | 成交金额           | 时间 |
 
-
-
-## /getRefundIndex
+## 9. /getRefundIndex 修改为getRefundInfo
 
 * 接口传参：
 
    1. 全平台：
 
-       ?shopId=2000000111&dt=2021-03-25 
+       ?shopId=2000000008&dt=2021-03-25 
 
    2. 区分平台：
 
-      ?shopId=2000000111&dt=2021-03-25&type=TB
+      ?shopId=2000000008&dt=2021-03-25&type=TB
+
+表名:shop_refund_info
 
 包含指标
 
 ```
-交易分析:
-成功退款金额
-成功退款笔数
-退款平均处理时间----运营响应时长
-退款率
-退款数量/成交数量
+ shop_id               '商铺ID'
+ order_type            '平台类型'
+ orders_succeed_number '支付成功数'
+ avg_time              '退款平均处理时间'
+ refund_money          '成功退款金额'
+ refund_number         '成功退款笔数'
+ refund_ratio          '退款率'
 ```
 
-| shop_id | avg_time         | refund_money | refund_number | quit_ratio | dt   |
-| ------- | ---------------- | ------------ | ------------- | ---------- | ---- |
-| 商铺ID  | 退款平均处理时间 | 成功退款金额 | 成功退款笔数  | 退款率     | 时间 |
+## 10. /getRefundReason
 
-## /getSaleUser？shopId=2000000085&skuId=2000000082&dt=2021-03-22
+* 接口传参：
+
+  1. 全平台：
+
+     ?shopId=2000000008&dt=2021-03-25
+
+  2. 区分平台：
+
+     ?shopId=2000000008&dt=2021-03-25&type=TB
+
+表名:shop_refund_info
+
+包含指标
+
+```
+shop_id              '商铺ID'
+shop_name            '商铺名称'
+order_type           '平台类型'
+refund_reason_number '总退款笔数'
+refund_money         '成功退款金额'
+refund_number        '成功退款笔数'
+refund_number_ratio  '退款金额比'
+refund_money_ratio   '退款笔数比'
+```
+
+
+
+
+
+## 11. /getRefundSku
+
+* 接口传参：
+
+  1. 全平台：
+
+     ?shopId=2000000008&dt=2021-03-25
+
+  2. 区分平台：
+
+     ?shopId=2000000008&dt=2021-03-25&type=TB
+
+表名:shop_refund_info
+
+包含指标
+
+```
+shop_id              '商铺ID'
+shop_name            '商铺名称'
+sku_id               '商品ID'
+order_type           '平台类型'
+sku_name             '商品名称'
+refund_reason_number '总退款笔数'
+refund_money         '成功退款金额'
+orders_succeed_money '订单金额'
+refund_number        '成功退款数量'
+refund_ratio         '退款率'
+refund_reason_ratio  '退款原因比'
+```
+
+
+
+
+
+
+
+
+
+## 12. /getSaleUser？shopId=2000000085&skuId=2000000082&dt=2021-03-22 --删除
 
 包含指标
 
@@ -183,27 +283,68 @@ shop_id 商铺ID
 | ------- | ------- | --------------- | ---- |
 | 商铺ID  | 商品SKU | 下单客户数      | 时间 |
 
-## /getPayIndex?shopId=2000000026&skuId=3000000032&dt=2021-03-22
+
+
+## 13. /getNewPutAway
+
+?shopId=2000000027&dt=2021-03-25
+
+最新在架商品
+
+表名:shop_goods_profit_top
+
+包含指标：
+
+```
+shop_id
+shelve_time 上架时间
+item_id 商品id
+item_name 商品名称
+```
+
+## 14. /getSaleTop
+
+?shopId=2000000027&dt=2021-03-25
+
+商品销量
+
+表名:shop_goods_sale_top
+
+包含指标：
+
+```
+shop_id
+sku_id 商品sku_id
+sale_number 销售数量
+sku_name 商品名称
+```
+
+## 15. /getPayIndex
+
+全渠道支付
+
+?shopId=2000000027&skuId=2000000045&dt=2021-03-25&type=all
+
+各渠道支付
+
+?shopId=2000000027&skuId=2000000045&dt=2021-03-25&type=no
 
 包含指标
 
 ```
-支付件数
-支付人数
-每个商品得支付金额
---------------------
-访问-支付转化率：--需埋点(暂时为空)
-支付客户数/访客数。
-下单客户数( 商品分析-商品明细)
+shop_id              '商铺ID'
+sku_id               'SKU商品'
+source_type          '渠道类型'
+sku_name             '上架商品名称'
+paid_number          '支付件数'
+sale_user_number     '支付人数'
+sale_succeed_money   '支付金额'
+all_sale_user_count  '总下单用户数'
+sku_rate             '支付转化率'
+dt                  
 ```
 
-| shop_id | sku_id  | paid_number | sale_user_count | sale_succeed_money | sku_rate   | dt   |
-| ------- | ------- | ----------- | --------------- | ------------------ | ---------- | ---- |
-| 商铺ID  | 商品SKU | 支付件数    | 支付人数        | 每个商品得支付金额 | 支付转化率 | 时间 |
-
-
-
-## /getClientSale
+## 16. /getClientSale
 
 * 接口传参：
 
@@ -218,35 +359,39 @@ shop_id 商铺ID
 包含指标
 
 ```
-客户分析:
-付款成功的客户数
-新成交客户数
-老成交客户数
-客户数占比
-新成交客户占比
-老成交客户占比
+shop_id                 
+order_type              '平台类型'
+user_dis_number         '全部成交客户占比'
+present_user_dis_number '当天划分平台成交的用户数'
+aged_user_dis_number    '当天划分平台成交的老用户数'
+new_user_dis_number     '成交的新用户数'
+type_user_ratio         '成交客户占比'
+new_user_ratio          '新成交客户占比'
+aged_user_ratio         '老成交客户占比'
+dt                      
 ```
-
-| shop_id | user_dis_number | present_user_dis_number | aged_user_dis_number | new_user_dis_number | type_user_ratio | new_user_ratio | aged_user_ratio | dt   |
-| ------- | --------------- | ----------------------- | -------------------- | ------------------- | --------------- | -------------- | --------------- | ---- |
-| 商铺ID  | 成交用户数      | 当天成交的用户数        | 当天成交的老用户数   | 当天成交的新用户数  | 成交客户占比    | 新成交客户占比 | 老成交客户占比  | 时间 |
-
-## /getClientSaleTop
+## 17. /getClientSaleTop
 
 * 接口传参：
 
-   1. 区分平台：
+   1. 全平台：
 
-      ?shopId=2000000027&dt=2021-03-25&type=TB
+      ?shopId=2000000079&dt=2021-03-25
+      
+   2. 区分平台：
+   
+      ?shopId=2000000079&dt=2021-03-25&type=TB
 
 包含指标
 
 ```
 客户分析:
 客户采购排行
+shop_id             
+order_type           '订单类型'
+user_name            '用户名'
+sale_succeed_money   '采购金额'
+sale_succeed_profit  '采购利润'
+dt                  
 ```
-
-| shop_id | order_type | user_name | sale_succeed_money | sale_succeed_profit | dt   |
-| ------- | ---------- | --------- | ------------------ | ------------------- | ---- |
-| 商铺ID  | 平台类型   | 用户名    | 采购金额           | 采购利润            | 时间 |
 

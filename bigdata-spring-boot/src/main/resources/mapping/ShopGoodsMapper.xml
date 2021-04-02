@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.bju.spring.bigdataspringboot.dao.ShopGoodsDao">
+    <!--    店铺-->
+    <select id="getGoodsNumber" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopPutawayGoodsBean">
+        select *
+        from putaway_goods
+        where shop_id = #{shopId}
+          and dt = #{dt}
+    </select>
+    <!--    最新上架商品-->
+    <select id="getShopNewPutAway" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopNewPutAwayBean">
+        select *
+        from shop_newputaway_goods
+        where shop_id = #{shopId}
+          and dt = #{dt}
+    </select>
+
+    <!--    商品销量排行-->
+    <select id="getShopGoodsSaleTop" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopGoodsSaleTopBean">
+        select *
+        from shop_goods_sale_top
+        where shop_id = #{shopId}
+          and dt = #{dt}
+       order by sale_number desc limit 10
+    </select>
+
+
+    <select id="getGoodsSale" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopGoodsSaleBean">
+        select *
+        from shop_goods_sale
+        where shop_id = #{shopId}
+          and dt = #{dt}
+    </select>
+    <!--全平台-->
+    <select id="getSaleSucceedInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopSaleSucceedInfoBean">
+        select *
+        from shop_sale_succeed_info
+        where shop_id = #{shopId}
+          and dt = #{dt} and order_type = 'all'
+    </select>
+    <!--划分平台-->
+    <select id="getSaleSucceedInfoType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopSaleSucceedInfoBean">
+        select *
+        from shop_sale_succeed_info
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+    </select>
+
+
+    <select id="getGoodsMoneyTop" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopGoodsMoneyTopBean">
+        select *
+        from shop_goods_money_top
+        where shop_id = #{shopId}
+          and dt = #{dt}
+        order by sale_succeed_money desc
+    </select>
+    <select id="getGoodsProfitTop" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopGoodsProfitTopBean">
+        select *
+        from shop_goods_profit_top
+        where shop_id = #{shopId}
+          and dt = #{dt}
+        order by sale_succeed_profit desc
+    </select>
+    <!--全平台-->
+    <select id="getShopProvinceTop" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopProvinceTopBean">
+        select *
+        from shop_province_info
+        where shop_id = #{shopId}
+          and dt = #{dt} and order_type = 'all'
+        order by sale_succeed_money desc limit 15
+    </select>
+    <!--划分平台-->
+    <select id="getShopProvinceTypeTop" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopProvinceTopBean">
+        select *
+        from shop_province_info
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+        order by sale_succeed_money desc limit 15
+    </select>
+    <!--全平台-->
+    <select id="getShopProvince" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopProvinceTopBean">
+        select province_name
+        from shop_province_info
+        where shop_id = #{shopId}
+          and dt = #{dt} and order_type = 'all'
+          group by province_name
+    </select>
+    <!--划分平台-->
+    <select id="getShopProvinceType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopProvinceTopBean">
+        select province_name
+        from goods_province_type_top
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+        group by province_name
+    </select>
+    <!--全平台-->
+    <select id="getGoodsSuccSale" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.GoodsSuccSale">
+        select shop_id,
+               sum(sale_succeed_money)    as sale_succeed_money,
+               sum(succeed_orders_number) as succeed_orders_number,
+               sum(sale_succeed_number)   as sale_succeed_number,
+               sum(sale_user_number)      as sale_user_number
+        from successful_transaction
+        where shop_id = #{shopId}
+          and dt = #{dt}
+        group by shop_id
+    </select>
+    <!--划分平台-->
+    <select id="getGoodsSuccSaleType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.GoodsSuccSaleType">
+        select *
+        from successful_transaction
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+    </select>
+   <!-- ##################退款 ##############  -->
+    <!--全平台-->
+    <select id="getShopRefundInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopRefundInfoBean">
+        select *
+        from shop_refund_info
+        where shop_id = #{shopId}
+          and dt = #{dt} and order_type = 'all'
+    </select>
+    <!--划分平台-->
+    <select id="getShopRefundInfoType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopRefundInfoBean">
+        select *
+        from shop_refund_info
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+    </select>
+
+    <!--全平台-->
+    <select id="getShopRefundReason" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopRefundReasonBean">
+        select *
+        from shop_refund_reason
+        where shop_id = #{shopId}
+          and dt = #{dt} and order_type = 'all'
+          order by refund_reason_number desc
+    </select>
+    <!--划分平台-->
+    <select id="getShopRefundReasonType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopRefundReasonBean">
+        select *
+        from shop_refund_reason
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+          order by refund_reason_number desc
+    </select>
+
+    <!--全平台-->
+    <select id="getShopRefundSku" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopRefundReasonBean">
+        select *
+        from shop_refund_sku
+        where shop_id = #{shopId}
+          and dt = #{dt} and order_type = 'all'
+        order by refund_reason_number desc
+    </select>
+    <!--划分平台-->
+    <select id="getShopRefundSkuType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopRefundReasonBean">
+        select *
+        from shop_refund_sku
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+        order by refund_reason_number desc
+    </select>
+
+
+
+    <!--客户分析销售-->
+    <select id="getClientSale" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopClientSaleBean">
+        select *
+        from shop_client_analysis
+        where shop_id = #{shopId}
+          and dt = #{dt} and order_type = 'all'
+    </select>
+    <!--客户分析销售分平台-->
+    <select id="getClientSaleType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopClientSaleBean">
+        select *
+        from shop_client_analysis
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+    </select>
+
+    <!--客户采购排行分平台-->
+    <select id="getClientSaleTopType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopClientSaleTopBean">
+        select *
+        from shop_client_sale_top
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = #{orderType}
+    </select>
+    <select id="getClientSaleTop" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopClientSaleTopBean">
+        select *
+        from shop_client_sale_top
+        where shop_id = #{shopId}
+          and dt = #{dt}
+          and order_type = 'all'
+    </select>
+    <!--    单商品-->
+<!--    <select id="getSaleUser" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.OrderSaleUserBean">-->
+<!--        select *-->
+<!--        from order_sale_user-->
+<!--        where shop_id = #{shopId}-->
+<!--          and sku_id = #{skuId}-->
+<!--          and dt = #{dt}-->
+<!--    </select>-->
+    <select id="getPayIndex" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopGoodsPayInfoBean">
+        select *
+        from shop_goods_pay_info
+        where shop_id = #{shopId}
+          and sku_id = #{skuId}
+          and dt = #{dt} and source_type = #{type}
+    </select>
+    <select id="getPayIndexType" resultType="com.cn.bju.spring.bigdataspringboot.bean.shop.ShopGoodsPayInfoBean">
+        select *
+        from shop_goods_pay_info
+        where shop_id = #{shopId}
+          and sku_id = #{skuId}
+          and dt = #{dt} and source_type != 'all'
+    </select>
+</mapper>

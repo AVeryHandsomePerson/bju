@@ -1,7 +1,6 @@
 package udf
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.expressions.UserDefinedFunction
 import utils.{BroadcastUtils, TypeUtils}
 
 /**
@@ -9,7 +8,7 @@ import utils.{BroadcastUtils, TypeUtils}
   * @Date: 2021/3/29 22:55
   * @Description:
   */
-object UDFRegister {
+object UDFRegister{
 
   def skuMapping(spark:SparkSession,dt:String): Unit ={
     val getSkuName = BroadcastUtils.getItemNameMap(spark, dt)
@@ -26,7 +25,7 @@ object UDFRegister {
   }
 
   def shopMapping(spark:SparkSession,dt:String): Unit ={
-    val getSkuName = BroadcastUtils.getItemNameMap(spark, dt)
+    val getSkuName = BroadcastUtils.getShopNameMap(spark, dt)
     spark.udf.register("shop_mapping", func = (skuId: Long) => {
       getSkuName.value.getOrElse(skuId,"")
     })
@@ -40,8 +39,16 @@ object UDFRegister {
   }
 
   def ordersStatusMapping(spark:SparkSession): Unit ={
-    spark.udf.register("orders_status_mapping", func = (skuId: String) => {
-      TypeUtils.map.getOrElse(skuId,"")
+    val map = TypeUtils.map
+    spark.udf.register("orders_status_mapping", func = (skuId: Long) => {
+      map.getOrElse(skuId.toString,"")
+    })
+  }
+
+  def clientMapping(spark:SparkSession,dt:String): Unit ={
+    val userMap = BroadcastUtils.getUserMap(spark, dt)
+    spark.udf.register("user_mapping", func = (userId: Long) => {
+      userMap.value.getOrElse(userId,"")
     })
   }
 }

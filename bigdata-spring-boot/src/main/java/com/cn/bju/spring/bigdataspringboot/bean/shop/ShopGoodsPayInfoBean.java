@@ -5,16 +5,18 @@ package com.cn.bju.spring.bigdataspringboot.bean.shop;
  * @version 1.0
  * @date 2021/3/24 18:24
  */
-public class PayIndexInfoBean {
+public class ShopGoodsPayInfoBean {
 
     private Long shopId;
     private Long skuId;
+    private String sourceType;
+    private String skuName;
     private Double paidNumber;
-    private Long saleUserCount;
+    private Long saleUserNumber;
+    private Long allSaleUserCount;
     private Double saleSucceedMoney;
     private Double skuRate;
     private String dt;
-
 
     public Long getShopId() {
         return shopId;
@@ -32,6 +34,14 @@ public class PayIndexInfoBean {
         this.skuId = skuId;
     }
 
+    public String getSkuName() {
+        return skuName;
+    }
+
+    public void setSkuName(String skuName) {
+        this.skuName = skuName;
+    }
+
     public Double getPaidNumber() {
         return paidNumber;
     }
@@ -40,12 +50,20 @@ public class PayIndexInfoBean {
         this.paidNumber = paidNumber;
     }
 
-    public Long getSaleUserCount() {
-        return saleUserCount;
+    public Long getSaleUserNumber() {
+        return saleUserNumber;
     }
 
-    public void setSaleUserCount(Long saleUserCount) {
-        this.saleUserCount = saleUserCount;
+    public void setSaleUserNumber(Long saleUserNumber) {
+        this.saleUserNumber = saleUserNumber;
+    }
+
+    public Long getAllSaleUserCount() {
+        return allSaleUserCount;
+    }
+
+    public void setAllSaleUserCount(Long allSaleUserCount) {
+        this.allSaleUserCount = allSaleUserCount;
     }
 
     public Double getSaleSucceedMoney() {
@@ -72,13 +90,24 @@ public class PayIndexInfoBean {
         this.dt = dt;
     }
 
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
     @Override
     public String toString() {
-        return "PayIndexInfoBean{" +
+        return "ShopGoodsPayInfoBean{" +
                 "shopId=" + shopId +
                 ", skuId=" + skuId +
+                ", sourceType='" + sourceType + '\'' +
+                ", skuName='" + skuName + '\'' +
                 ", paidNumber=" + paidNumber +
-                ", saleUserCount=" + saleUserCount +
+                ", saleUserNumber=" + saleUserNumber +
+                ", allSaleUserCount=" + allSaleUserCount +
                 ", saleSucceedMoney=" + saleSucceedMoney +
                 ", skuRate=" + skuRate +
                 ", dt='" + dt + '\'' +

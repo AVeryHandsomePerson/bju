@@ -1,14 +1,13 @@
 package com.cn.bju.spring.bigdataspringboot.controller;
 
 import com.cn.bju.spring.bigdataspringboot.bean.shop.*;
-import com.cn.bju.spring.bigdataspringboot.service.GoodsService;
+import com.cn.bju.spring.bigdataspringboot.service.ShopGoodsService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,9 +18,9 @@ import java.util.Map;
 @Controller
 @Slf4j
 @CrossOrigin
-public class GoodsController {
+public class ShopGoodsController {
     @Autowired
-    private GoodsService goodsService;
+    private ShopGoodsService shopGoodsService;
 
     @RequestMapping("/getShelves")
     @ResponseBody
@@ -30,7 +29,7 @@ public class GoodsController {
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(goodsService.getGoodsNumber(shopId, dt));
+            data.setData(shopGoodsService.getGoodsNumber(shopId, dt));
             data.setCode(1000);
             return data;
         }
@@ -39,6 +38,41 @@ public class GoodsController {
         return data;
 
     }
+
+    @RequestMapping("/getNewPutAway")
+    @ResponseBody
+    public ResponseData getShopNewPutAway(@RequestParam Map<String, String> param) {
+        ResponseData data = new ResponseData();
+        String shopId = param.getOrDefault("shopId", "");
+        String dt = param.getOrDefault("dt", "");
+        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+            data.setData(shopGoodsService.getShopNewPutAway(shopId, dt));
+            data.setCode(1000);
+            return data;
+        }
+        data.setMsg("请检查参数是否为空");
+        data.setCode(1200);
+        return data;
+
+    }
+
+    @RequestMapping("/getSaleTop")
+    @ResponseBody
+    public ResponseData getShopGoodsSaleTop(@RequestParam Map<String, String> param) {
+        ResponseData data = new ResponseData();
+        String shopId = param.getOrDefault("shopId", "");
+        String dt = param.getOrDefault("dt", "");
+        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+            data.setData(shopGoodsService.getShopGoodsSaleTop(shopId, dt));
+            data.setCode(1000);
+            return data;
+        }
+        data.setMsg("请检查参数是否为空");
+        data.setCode(1200);
+        return data;
+
+    }
+
 
     @RequestMapping("/getSale")
     @ResponseBody
@@ -47,7 +81,7 @@ public class GoodsController {
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(goodsService.getGoodsSale(shopId, dt));
+            data.setData(shopGoodsService.getGoodsSale(shopId, dt));
             data.setCode(1000);
             return data;
         }
@@ -56,18 +90,18 @@ public class GoodsController {
         return data;
     }
 
-    @RequestMapping("/getClientPrice")
+    @RequestMapping("/getSaleInfo")
     @ResponseBody
-    public ResponseData getClientOnPrice(@RequestParam Map<String, String> param) {
+    public ResponseData getSaleSucceedInfo(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         String orderType = param.getOrDefault("type", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(goodsService.getClientOnPrice(shopId, dt));
+                data.setData(shopGoodsService.getSaleSucceedInfo(shopId, dt));
             } else {
-                data.setData(goodsService.getClientOnPriceType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getSaleSucceedInfoType(shopId, dt, orderType));
             }
             data.setCode(1000);
             return data;
@@ -84,7 +118,7 @@ public class GoodsController {
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(goodsService.getGoodsMoneyTop(shopId, dt));
+            data.setData(shopGoodsService.getGoodsMoneyTop(shopId, dt));
             data.setCode(1000);
             return data;
         }
@@ -100,7 +134,7 @@ public class GoodsController {
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(goodsService.getGoodsProfitTop(shopId, dt));
+            data.setData(shopGoodsService.getGoodsProfitTop(shopId, dt));
             data.setCode(1000);
             return data;
         }
@@ -111,16 +145,16 @@ public class GoodsController {
 
     @RequestMapping("/getProvinceTop")
     @ResponseBody
-    public ResponseData getGoodsProvinceTop(@RequestParam Map<String, String> param) {
+    public ResponseData getShopProvinceTop(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         String orderType = param.getOrDefault("type", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(goodsService.getGoodsProvinceTop(shopId, dt));
+                data.setData(shopGoodsService.getShopProvinceTop(shopId, dt));
             } else {
-                data.setData(goodsService.getGoodsProvinceTypeTop(shopId, dt, orderType));
+                data.setData(shopGoodsService.getShopProvinceTypeTop(shopId, dt, orderType));
             }
             data.setCode(1000);
             return data;
@@ -130,18 +164,18 @@ public class GoodsController {
         return data;
     }
 
-    @RequestMapping("/getSalSuc")
+    @RequestMapping("/getProvince")
     @ResponseBody
-    public ResponseData getGoodsSuccessfulSale(@RequestParam Map<String, String> param) {
+    public ResponseData getShopProvince(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         String orderType = param.getOrDefault("type", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(goodsService.getGoodsSuccSale(shopId, dt));
+                data.setData(shopGoodsService.getShopProvince(shopId, dt));
             } else {
-                data.setData(goodsService.getGoodsSuccSaleType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getShopProvinceType(shopId, dt, orderType));
             }
             data.setCode(1000);
             return data;
@@ -150,6 +184,28 @@ public class GoodsController {
         data.setCode(1200);
         return data;
     }
+
+
+//    @RequestMapping("/getSalSuc")
+//    @ResponseBody
+//    public ResponseData getGoodsSuccessfulSale(@RequestParam Map<String, String> param) {
+//        ResponseData data = new ResponseData();
+//        String shopId = param.getOrDefault("shopId", "");
+//        String dt = param.getOrDefault("dt", "");
+//        String orderType = param.getOrDefault("type", "");
+//        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+//            if (StringUtils.isEmpty(orderType)) {
+//                data.setData(shopGoodsService.getGoodsSuccSale(shopId, dt));
+//            } else {
+//                data.setData(shopGoodsService.getGoodsSuccSaleType(shopId, dt, orderType));
+//            }
+//            data.setCode(1000);
+//            return data;
+//        }
+//        data.setMsg("请检查参数是否为空");
+//        data.setCode(1200);
+//        return data;
+//    }
 
     @RequestMapping("/getClientSale")
     @ResponseBody
@@ -160,9 +216,9 @@ public class GoodsController {
         String orderType = param.getOrDefault("type", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(goodsService.getClientSale(shopId, dt));
+                data.setData(shopGoodsService.getClientSale(shopId, dt));
             } else {
-                data.setData(goodsService.getClientSaleType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getClientSaleType(shopId, dt, orderType));
             }
             data.setCode(1000);
             return data;
@@ -179,30 +235,11 @@ public class GoodsController {
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt) && StringUtils.isNotEmpty(orderType)) {
-            data.setData(goodsService.getClientSaleTopType(shopId, dt, orderType));
-            data.setCode(1000);
-            return data;
-        }
-        data.setMsg("请检查参数是否为空");
-        data.setCode(1200);
-        return data;
-    }
-
-
-
-    @RequestMapping("/getRefundIndex")
-    @ResponseBody
-    public ResponseData getRefundIndex(@RequestParam Map<String, String> param) {
-        ResponseData data = new ResponseData();
-        String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
-        String orderType = param.getOrDefault("type", "");
         if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(goodsService.getRefundIndex(shopId, dt));
+                data.setData(shopGoodsService.getClientSaleTop(shopId, dt));
             } else {
-                data.setData(goodsService.getRefundIndexType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getClientSaleTopType(shopId, dt, orderType));
             }
             data.setCode(1000);
             return data;
@@ -212,15 +249,42 @@ public class GoodsController {
         return data;
     }
 
-    @RequestMapping("/getSaleUser")
+
+    //退款信息
+    @RequestMapping("/getRefundInfo")
     @ResponseBody
-    public ResponseData getSaleUser(@RequestParam Map<String, String> param) {
+    public ResponseData getRefundIndex(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
-        String skuId = param.getOrDefault("skuId", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)&& StringUtils.isNotEmpty(skuId)) {
-            data.setData(goodsService.getSaleUser(shopId,skuId, dt));
+        String orderType = param.getOrDefault("type", "");
+        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+            if (StringUtils.isEmpty(orderType)) {
+                data.setData(shopGoodsService.getShopRefundInfo(shopId, dt));
+            } else {
+                data.setData(shopGoodsService.getShopRefundInfoType(shopId, dt, orderType));
+            }
+            data.setCode(1000);
+            return data;
+        }
+        data.setMsg("请检查参数是否为空");
+        data.setCode(1200);
+        return data;
+    }
+    //退款理由
+    @RequestMapping("/getRefundReason")
+    @ResponseBody
+    public ResponseData getRefundReason(@RequestParam Map<String, String> param) {
+        ResponseData data = new ResponseData();
+        String shopId = param.getOrDefault("shopId", "");
+        String dt = param.getOrDefault("dt", "");
+        String orderType = param.getOrDefault("type", "");
+        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+            if (StringUtils.isEmpty(orderType)) {
+                data.setData(shopGoodsService.getShopRefundReason(shopId, dt));
+            } else {
+                data.setData(shopGoodsService.getShopRefundReasonType(shopId, dt, orderType));
+            }
             data.setCode(1000);
             return data;
         }
@@ -229,6 +293,46 @@ public class GoodsController {
         return data;
     }
 
+    //退款商品
+    @RequestMapping("/getRefundSku")
+    @ResponseBody
+    public ResponseData getRefundSku(@RequestParam Map<String, String> param) {
+        ResponseData data = new ResponseData();
+        String shopId = param.getOrDefault("shopId", "");
+        String dt = param.getOrDefault("dt", "");
+        String orderType = param.getOrDefault("type", "");
+        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+            if (StringUtils.isEmpty(orderType)) {
+                data.setData(shopGoodsService.getShopRefundSku(shopId, dt));
+            } else {
+                data.setData(shopGoodsService.getShopRefundSkuType(shopId, dt, orderType));
+            }
+            data.setCode(1000);
+            return data;
+        }
+        data.setMsg("请检查参数是否为空");
+        data.setCode(1200);
+        return data;
+    }
+
+
+//    @RequestMapping("/getSaleUser")
+//    @ResponseBody
+//    public ResponseData getSaleUser(@RequestParam Map<String, String> param) {
+//        ResponseData data = new ResponseData();
+//        String shopId = param.getOrDefault("shopId", "");
+//        String dt = param.getOrDefault("dt", "");
+//        String skuId = param.getOrDefault("skuId", "");
+//        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)&& StringUtils.isNotEmpty(skuId)) {
+//            data.setData(shopGoodsService.getSaleUser(shopId,skuId, dt));
+//            data.setCode(1000);
+//            return data;
+//        }
+//        data.setMsg("请检查参数是否为空");
+//        data.setCode(1200);
+//        return data;
+//    }
+
     @RequestMapping("/getPayIndex")
     @ResponseBody
     public ResponseData getPayIndex(@RequestParam Map<String, String> param) {
@@ -236,8 +340,16 @@ public class GoodsController {
         String shopId = param.getOrDefault("shopId", "");
         String dt = param.getOrDefault("dt", "");
         String skuId = param.getOrDefault("skuId", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt) && StringUtils.isNotEmpty(skuId)) {
-            data.setData(goodsService.getPayIndex(shopId, skuId,dt));
+        String sourctType = param.getOrDefault("type", "");
+        if (StringUtils.isNotEmpty(shopId) &&
+                StringUtils.isNotEmpty(dt) &&
+                StringUtils.isNotEmpty(skuId) &&
+                StringUtils.isNotEmpty(sourctType)) {
+            if(sourctType.equals("all")) {
+                data.setData(shopGoodsService.getPayIndex(shopId, skuId, dt, sourctType));
+            }else{
+                data.setData(shopGoodsService.getPayIndexType(shopId, skuId, dt, sourctType));
+            }
             data.setCode(1000);
             return data;
         }

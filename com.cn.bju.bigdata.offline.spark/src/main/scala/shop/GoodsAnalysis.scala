@@ -22,7 +22,17 @@ object GoodsAnalysis {
       .enableHiveSupport()
       .getOrCreate()
     val dt = args(0)
-    spark.sqlContext.cacheTable("dwd.dw_orders_merge_detail")
+
+
+    spark.sql(
+      """
+        |select
+        |*
+        |from
+        |dwd.dw_orders_merge_detail
+        |""".stripMargin).createOrReplaceTempView("orders")
+
+    spark.sqlContext.cacheTable("orders")
     UDFRegister.shopMapping(spark,dt)
 
 
@@ -40,22 +50,19 @@ object GoodsAnalysis {
 //        |""".stripMargin)
 
       spark.sql(
-        """
-          |select
-          |shop_id,
-          |shop_mapping(shop_id) as shop_name,
-          |count(distinct case when status = 4 then  item_id end) as item_number
-          |from
-          |ods.ods_item
-          |-- where dt = $dt
-          |group by shop_id
-        """.stripMargin).createOrReplaceTempView("shelf_goods_shelves")
-
-
-
-//      .write
-//      .mode(SaveMode.Append)
-//      .jdbc(StarvConfig.url,"goods_shelves",StarvConfig.properties)
+        s"""
+            |select
+            |shop_id,
+            |count(distinct case when status = 4 then  item_id end) as item_number,
+            |$dt as dt
+            |from
+            |ods.ods_item
+            |-- where dt = $dt
+            |group by shop_id
+        """.stripMargin)
+      .write
+      .mode(SaveMode.Append)
+      .jdbc(StarvConfig.url,"putaway_goods",StarvConfig.properties)
 
     //解析hdfs_page
 //    spark.sql(
@@ -92,13 +99,13 @@ object GoodsAnalysis {
 //         |""".stripMargin).createOrReplaceTempView("goods_pv")
     //
     /**
-     *动销商品数 = 有成交的商品的品种数，
+     *动销商品数 = 有成交的商品的品种数
      *成交订单为当日付款当日未取消的在线支付订单，
      *或者当日下单当日未取消的货到付款订单。
      *下单客户数
      *下单笔数
      *下单商品件数
-     *成交商品件数
+     * 成交商品件数
      * 成交金额
      *商品成交转化率 --需要埋点
      */
@@ -108,19 +115,23 @@ object GoodsAnalysis {
          |shop_id,
          |shop_mapping(shop_id) as shop_name,
          |count(distinct case when paid = 2 then sku_id end) as sale_number,
-         |count(distinct buyer_id) as sale_user_number,
-         |count(distinct order_id) as sale_number,
+         |count(distinct buyer_id) as orders_user_number,
+         |count(distinct order_id) as orders_number,
          |round(sum(case when num is null then 0 else num end ),2) as sale_goods_number,
          |round(sum(case when paid = 2 and refund = 0 then num end),2) as sale_succeed_number,
          |round(sum(case when paid = 2 and refund = 0 then payment_total_money end),2) as sale_succeed_money,
+         |0.0 goods_transform_ratio,
          |$dt as dt
          |from
-         |dwd.dw_orders_merge_detail
+         |orders
          |group by shop_id
          |""".stripMargin)
       .write
       .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"goods_sale",StarvConfig.properties)
+      .jdbc(StarvConfig.url,"shop_goods_sale",StarvConfig.properties)
+
+
+
 
 //    spark.sql(
 //      s"""
@@ -263,37 +274,7 @@ object GoodsAnalysis {
      * 2.统计出成交客户数
      * 3.成交客户数/商品访问数
      */
-//    spark.sql(
-//      """
-//        |with
-//        |succeed_user as(
-//        |select
-//        |shop_id,
-//        |count(distinct buyer_id) as sale_user_count
-//        |from
-//        |dwd.dw_orders_merge_detail
-//        |where paid = 2 and refund = 0
-//        |group by shop_id
-//        |),
-//        |shop_user_visit as (
-//        |SELECT
-//        |item_id,
-//        |count(1) shop_user_uv
-//        |from  hdfs_page
-//        |GROUP BY item_id
-//        |),
-//        |select
-//        |a.shop_id,
-//        |case when b.shop_user_uv is null
-//        |then 0 else
-//        |a.sale_user_count/b.shop_user_uv
-//        |end as sku_rate
-//        |from
-//        |succeed_user a
-//        |left join
-//        |shop_user_visit b
-//        |on a.shop_id = b.item_id
-//        |""".stripMargin)
+
 
     /**
      * 商品金额TOP 10
@@ -310,7 +291,7 @@ object GoodsAnalysis {
         |count(distinct buyer_id) as sale_user_count,
         |round(sum(payment_total_money),2) as sale_succeed_money
         |from
-        |dwd.dw_orders_merge_detail
+        |orders
         |where paid = 2 and refund = 0
         |group by shop_id,item_name
         |),
@@ -338,7 +319,7 @@ object GoodsAnalysis {
         |""".stripMargin)
       .write
       .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"goods_money_top",StarvConfig.properties)
+      .jdbc(StarvConfig.url,"shop_goods_money_top",StarvConfig.properties)
 
     /**
      * 商品利润TOP 10
@@ -356,7 +337,7 @@ object GoodsAnalysis {
         |buyer_id,
         |payment_total_money - (num * cost_price) as profit
         |from
-        |dwd.dw_orders_merge_detail
+        |orders
         |where paid = 2 and refund = 0
         |),
         |t2 as(
@@ -392,7 +373,25 @@ object GoodsAnalysis {
         |""".stripMargin)
       .write
       .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"goods_profit_top",StarvConfig.properties)
+      .jdbc(StarvConfig.url,"shop_goods_profit_top",StarvConfig.properties)
+
+
+
+    spark.sql(
+      s"""
+         |select
+         |hour(payment_time) as payment_time,
+         |count(distinct order_id) as payment_order_number,
+         |$dt as dt
+         |from
+         |orders
+         |where order_type = 6 or order_type = 8
+         |group by
+         |hour(payment_time)
+         |""".stripMargin)
+      .write
+      .mode(SaveMode.Append)
+      .jdbc(StarvConfig.url,"platform_orders_time",StarvConfig.properties)
 
   }
 }
