@@ -1,5 +1,5 @@
 --商城表
-create external table ods.shop_info
+create external table ods.ods_shop_info
 (
     shop_id              bigint          comment  '店铺id',
     seller_id            bigint          comment '卖家id',
@@ -55,7 +55,7 @@ create external table ods.shop_info
 PARTITIONED BY (
   `dt` string
 )
-stored as orc
+stored as parquet
 location '/user/hive/warehouse/ods.db/shop_info'
 tblproperties ("orc.compression"="snappy");
 ALTER TABLE ods.shop_info ADD IF NOT EXISTS PARTITION (dt='20210325') location '/user/hive/warehouse/ods.db/shop_info/dt=20210325/';
@@ -77,7 +77,9 @@ create table ods.ods_plat_industry_rel
 PARTITIONED BY (
   `dt` string
 )
-stored as orc
+stored as parquet
 location '/user/hive/warehouse/ods.db/ods_plat_industry_rel'
 tblproperties ("orc.compression"="snappy");
+
+
 ALTER TABLE ods.ods_plat_industry_rel ADD IF NOT EXISTS PARTITION (dt='20210325') location '/user/hive/warehouse/ods.db/ods_plat_industry_rel/dt=20210325/';

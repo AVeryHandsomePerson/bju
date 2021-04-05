@@ -18,7 +18,7 @@ cat_1t_id string,                   -- 一级商品分类id
 cat_1t_name string                  -- 一级商品分类名称
 )
 partitioned by (dt string)
-STORED AS PARQUET TBLPROPERTIES('parquet.compression'='SNAPPY');
+STORED AS parquet TBLPROPERTIES('parquet.compression'='SNAPPY');
 
 create table if not exists dwd.dw_shop_order(
 shop_id string,
@@ -29,7 +29,7 @@ industry string,
 industry_name string
 )
 partitioned by (dt string)
-STORED AS PARQUET TBLPROPERTIES('parquet.compression'='SNAPPY');
+STORED AS parquet TBLPROPERTIES('parquet.compression'='SNAPPY');
 
 
 
@@ -58,7 +58,7 @@ comment '基础字典表'
 PARTITIONED BY (
 dt string
 )
-stored as orc
+stored as parquet
 location '/user/hive/warehouse/ods.db/ods_base_dictionary'
 tblproperties ("orc.compression"="snappy");
 ALTER TABLE ods_base_dictionary ADD IF NOT EXISTS PARTITION (dt='20210325') location '/user/hive/warehouse/ods.db/ods_base_dictionary/dt=20210325/';
