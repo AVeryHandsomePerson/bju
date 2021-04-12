@@ -29,7 +29,7 @@ create table shop_goods_sale
     sale_succeed_number   bigint comment '成交商品件数',
     sale_succeed_money    double comment '成交金额',
     goods_transform_ratio double comment '商品转换率',
-    dt                    date   not null
+    dt                    date not null
 )comment '店铺-商品分析-商品销售' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- create table place_orders_goods
 -- (
@@ -67,28 +67,45 @@ create table putaway_goods
 ) comment '统计在架商品数据' charset = utf8;
 
 
-
 -- auto-generated definition
 create table shop_goods_money_top
 (
-    shop_id            bigint ,
+    shop_id            bigint,
     item_name          varchar(255),
     sale_user_count    bigint comment '支付人数',
     sale_succeed_money double comment '统计支付金额',
     sale_ratio         double comment '支付金额占总支付金额比例',
-    dt                 date   not null
-)
-    comment '商品金额TOP 10' charset = utf8;
+    dt                 date not null
+) comment '商品金额TOP 10' charset = utf8;
 
 
 -- auto-generated definition
 create table shop_goods_profit_top
 (
     shop_id             bigint null,
-    item_name           varchar(255)   null,
-    sale_user_count     bigint  comment '支付人数',
+    item_name           varchar(255) null,
+    sale_user_count     bigint comment '支付人数',
     sale_succeed_profit double comment '统计利润',
     sale_profit_ratio   double comment '统计利润比',
-    dt                  date   not null
-)
-    comment '商品利润TOP 10' charset = utf8;
+    dt                  date not null
+) comment '商品利润TOP 10' charset = utf8;
+
+
+create table shop_goods_purchase_type
+(
+    shop_id         bigint null,
+    name            varchar(255) null,
+    pu_type         bigint comment '类型',
+    pu_num    double comment '采购数量',
+    dt              date not null
+) comment '商品采购数据统计' charset = utf8;
+
+create table shop_goods_purchase_info
+(
+    id integer  PRIMARY KEY AUTO_INCREMENT comment 'id',
+    shop_id        bigint,
+    name           varchar(255) null,
+    pu_num   varchar(255) comment '采购数量',
+    pu_money double comment '采购金额',
+    dt             date not null
+) comment '商品采购数据统计' charset = utf8;

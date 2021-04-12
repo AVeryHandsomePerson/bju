@@ -1,6 +1,6 @@
 # 接口
 ## 1. /getShelves
-?shopId=2000000027&dt=2021-03-25
+?shopId=2000000085&startTime=2021-03-29&endTime=2021-03-30
 
 表名:putaway_goods
 
@@ -11,7 +11,7 @@ item_number 在架商品数
 ```
 
 ## 2. /getSale
-?shopId=2000000027&dt=2021-03-25
+?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
 表名:shop_goods_sale
 
@@ -37,15 +37,15 @@ goods_transform_ratio 商品转换率 --需要埋点目前为00
 
    1. 全平台：
 
-      ?shopId=2000000085&dt=2021-03-25
+      ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
    2. 区分平台：
 
-      ?shopId=2000000085&dt=2021-03-22&type=TB 
+      ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&type=TB 
 
       or
 
-      ?shopId=2000000085&dt=2021-03-25&type=TC
+      ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&type=TC
 
 包含指标：
 
@@ -61,7 +61,7 @@ goods_transform_ratio 商品转换率 --需要埋点目前为00
 
 ## 4. /getMoneyTop
 
-?shopId=2000000027&dt=2021-03-25
+?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
 商品金额TOP
 
@@ -76,7 +76,7 @@ sale_ratio 统计支付金额占总支付金额比例
 ```
 
 ## 5. /getProfitTop
-?shopId=2000000027&dt=2021-03-25
+?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
 商品利润TOP
 
@@ -100,11 +100,11 @@ sale_profit_ratio 利润占比
 
    1. 全平台：
 
-      ?shopId=2000000008&dt=2021-03-25 
+      ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
    2. 区分平台：
 
-      ?shopId=2000000008&dt=2021-03-25&type=TB
+      ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&type=TB
 
 包含指标：
 
@@ -120,11 +120,11 @@ province_name --省份
 
   1. 全平台：
 
-     ?shopId=2000000008&dt=2021-03-25 
+     ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&dt=2021-03-25 
 
   2. 区分平台：
 
-     ?shopId=2000000008&dt=2021-03-25&type=TB
+     ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&type=TB
 
 包含指标：
 
@@ -148,11 +148,11 @@ sale_ratio -- 支付比例
 
    1. 全平台：
 
-       ?shopId=2000000111&dt=2021-03-25 
+       ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
    2. 区分平台：
 
-      ?shopId=2000000111&dt=2021-03-25&type=TB 
+      ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&type=TB 
 
 包含指标：
 
@@ -182,11 +182,11 @@ sale_ratio -- 支付比例
 
    1. 全平台：
 
-       ?shopId=2000000008&dt=2021-03-25 
+       ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
    2. 区分平台：
 
-      ?shopId=2000000008&dt=2021-03-25&type=TB
+      ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&type=TB
 
 表名:shop_refund_info
 
@@ -208,11 +208,11 @@ sale_ratio -- 支付比例
 
   1. 全平台：
 
-     ?shopId=2000000008&dt=2021-03-25
+     ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
   2. 区分平台：
 
-     ?shopId=2000000008&dt=2021-03-25&type=TB
+     ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&type=TB
 
 表名:shop_refund_info
 
@@ -239,11 +239,11 @@ refund_money_ratio   '退款笔数比'
 
   1. 全平台：
 
-     ?shopId=2000000008&dt=2021-03-25
+     ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30
 
   2. 区分平台：
 
-     ?shopId=2000000008&dt=2021-03-25&type=TB
+     ?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&type=TB
 
 表名:shop_refund_info
 
@@ -287,7 +287,7 @@ refund_reason_ratio  '退款原因比'
 
 ## 13. /getNewPutAway
 
-?shopId=2000000027&dt=2021-03-25
+?shopId=2000000085&startTime=2021-03-29&endTime=2021-03-30
 
 最新在架商品
 
@@ -304,7 +304,7 @@ item_name 商品名称
 
 ## 14. /getSaleTop
 
-?shopId=2000000027&dt=2021-03-25
+?shopId=2000000085&startTime=2021-03-29&endTime=2021-03-30
 
 商品销量
 
@@ -323,11 +323,11 @@ sku_name 商品名称
 
 全渠道支付
 
-?shopId=2000000027&skuId=2000000045&dt=2021-03-25&type=all
+?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&skuId=2000000045&type=all
 
 各渠道支付
 
-?shopId=2000000027&skuId=2000000045&dt=2021-03-25&type=no
+?shopId=2000000082&startTime=2021-03-29&endTime=2021-03-30&skuId=2000000045&type=no
 
 包含指标
 
@@ -350,11 +350,11 @@ dt
 
    1. 全平台：
 
-      ?shopId=2000000079&dt=2021-03-25
+      ?shopId=2000000085&startTime=2021-03-29&endTime=2021-03-30
 
    2. 区分平台：
 
-      ?shopId=2000000079&dt=2021-03-25&type=TB
+      ?shopId=2000000085&startTime=2021-03-29&endTime=2021-03-30&type=TB
 
 包含指标
 
@@ -376,11 +376,11 @@ dt
 
    1. 全平台：
 
-      ?shopId=2000000079&dt=2021-03-25
+      ?shopId=2000000085&startTime=2021-03-29&endTime=2021-03-30
       
    2. 区分平台：
    
-      ?shopId=2000000079&dt=2021-03-25&type=TB
+      ?shopId=2000000085&startTime=2021-03-29&endTime=2021-03-30&type=TB
 
 包含指标
 
@@ -393,5 +393,126 @@ user_name            '用户名'
 sale_succeed_money   '采购金额'
 sale_succeed_profit  '采购利润'
 dt                  
+```
+
+## 18. /pu_info 改为/puInfo
+
+* 接口传参：
+
+
+​            ?shopId=2000000087&startTime=2021-04-02&endTime=2021-04-02&limit=10&page=0
+
+包含指标
+
+```
+采购分析:
+详细数据
+shop_id             
+name       '商品名称'
+pu_num     '采购数量'
+pu_money   '采购金额'
+dt                  
+```
+
+## 19. /pu_type改为/puType
+
+* 接口传参：
+
+  1.商品：
+
+   ?shopId=2000000087&startTime=2021-04-02&endTime=2021-04-02&type=1
+
+  2.供应商：
+
+    ?shopId=2000000087&startTime=2021-04-02&endTime=2021-04-02&type=2
+
+  3.类目 
+
+​         ?shopId=2000000087&startTime=2021-04-02&endTime=2021-04-02&type=3
+
+包含指标
+
+```
+采购分析:
+详细数据
+shop_id             
+name       
+pu_type  '类型'
+pu_num   '采购数量'
+dt                  
+```
+
+## 20. /getWareHouseInOut
+
+* 接口传参：
+
+  1.商品：
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=1
+
+  分页:
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=1&limit=10&page=1
+
+  2.仓库：
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=2
+
+  分页:
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=2&limit=10&page=1
+
+包含指标
+
+```
+id               
+shop_id          
+business_id      业务ID
+business_name    业务名称
+real_inbound_num 入库数量
+real_outbound_num 出库数量
+business_type    1 商品 2仓库
+dt                            
+```
+
+## 21. /getWareHouseInfo
+
+* 接口传参：
+
+  1.商品：
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=1
+
+  分页:
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=1&limit=10&page=1
+
+  2.仓库：
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=2
+
+  分页:
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=2&limit=10&page=1
+
+  3.品牌
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=3
+
+  分页:
+
+  ?shopId=2000000102&startTime=2021-04-02&endTime=2021-04-02&type=2&limit=10&page=1
+
+包含指标
+
+```
+id            
+shop_id       
+business_id   业务ID
+business_name 业务名称
+inventory     库存
+number_money  金额
+business_type 1 商品 2仓库  3品牌
+dt                             
 ```
 

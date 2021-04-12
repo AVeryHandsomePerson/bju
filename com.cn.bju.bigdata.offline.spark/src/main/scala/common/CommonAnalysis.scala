@@ -1,6 +1,7 @@
 package common
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.joda.time.DateTime
+import udf.UDFRegister
 
 import java.util.Properties
 
@@ -11,10 +12,7 @@ import java.util.Properties
  * 公共指标
  */
 object CommonAnalysis {
-
-
   def main(args: Array[String]): Unit = {
-
     val spark = SparkSession.builder()
       .appName("CommonAnalysis")
       .config("hive.exec.dynamici.partition", true)
@@ -24,14 +22,14 @@ object CommonAnalysis {
     val dt = args(0)
 
     spark.sql(
-      """
+      s"""
         |select
         |*
         |from
         |dwd.dw_orders_merge_detail
         |""".stripMargin).createOrReplaceTempView("orders_merge_detail")
     spark.sqlContext.cacheTable("orders_merge_detail")
-
+    UDFRegister.shopMapping(spark,dt)
     /**
      * 成交金额 =本店收款的支付金额  and 成交商品件数 and 成交单量
      * and 支付人数
@@ -42,24 +40,24 @@ object CommonAnalysis {
      * 增加 sale_user_number，sale_succeed_money，order_type
      */
 
-    spark.sql(
-      s"""
-         |select
-         |shop_id,
-         |order_type,
-         |round(sum(num),2) as sale_succeed_number,
-         |count(distinct order_id) as succeed_orders_number,
-         |count(distinct buyer_id) as sale_user_number,
-         |round(sum(payment_total_money),2) as sale_succeed_money,
-         |$dt as dt
-         |from
-         |dwd.dw_orders_merge_detail
-         |where paid = 2 and refund = 0
-         |group by shop_id,order_type
-         |""".stripMargin)
-      .write
-      .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"successful_transaction",StarvConfig.properties)
+//    spark.sql(
+//      s"""
+//         |select
+//         |shop_id,
+//         |order_type,
+//         |round(sum(num),2) as sale_succeed_number,
+//         |count(distinct order_id) as succeed_orders_number,
+//         |count(distinct buyer_id) as sale_user_number,
+//         |round(sum(payment_total_money),2) as sale_succeed_money,
+//         |$dt as dt
+//         |from
+//         |orders_merge_detail
+//         |where paid = 2 and refund = 0
+//         |group by shop_id,order_type
+//         |""".stripMargin)
+//      .write
+//      .mode(SaveMode.Append)
+//      .jdbc(StarvConfig.url,"successful_transaction",StarvConfig.properties)
 
     /**
      * 商品省份TOP 10
@@ -102,8 +100,7 @@ object CommonAnalysis {
          |$dt as dt
          |from
          |t2
-         |""".stripMargin).union(spark.sql(
-      s"""
+         |""".stripMargin).union(spark.sql(s"""
          |with t1 as(
          |select
          |shop_id,

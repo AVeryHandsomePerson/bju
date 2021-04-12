@@ -1,5 +1,5 @@
 echo 'orders'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/tradecenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -26,7 +26,7 @@ sqoop import \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
 echo 'orders_receive_info'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/tradecenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -39,10 +39,8 @@ sqoop import  \
 --hcatalog-partition-values ${dt} \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
-
-
 echo 'refund_detail'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/tradecenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -55,9 +53,8 @@ sqoop import  \
 --hcatalog-partition-values ${dt} \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
-
 echo 'refund_apply'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/tradecenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -71,7 +68,7 @@ sqoop import  \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
 echo 'item'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/goodscenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -84,9 +81,8 @@ sqoop import  \
 --hcatalog-partition-values ${dt} \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
-
 echo 'item_sku'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/goodscenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -100,7 +96,7 @@ sqoop import  \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
 echo 'item_category'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/goodscenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -113,10 +109,8 @@ sqoop import  \
 --hcatalog-partition-values ${dt} \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
-
-
 echo 'shop_info'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/storecenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -129,40 +123,37 @@ sqoop import  \
 --hcatalog-partition-values ${dt} \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
-
-echo 'shop_info'+${dt}
-sqoop import  \
---connect jdbc:mysql://10.2.0.92:3306/storecenter?serverTimezone=GMT%2B8 \
+echo 'plat_industry_rel'+${dt}
+sqoop import \
+--connect jdbc:mysql://10.2.0.92:3306/basecenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
---query "select id,platform,platform_name,industry,industry_name,create_time,update_time,create_user,update_user,yn,description from shop_info where  \$CONDITIONS" \
+--query "select id,platform,platform_name,industry,industry_name,create_time,update_time,create_user,update_user,yn,description from plat_industry_rel where  \$CONDITIONS" \
 --driver com.mysql.jdbc.Driver \
---split-by platform \
+--split-by id \
 --hcatalog-database ods \
---hcatalog-table ods_shop_info \
+--create-hcatalog-table \
+--hcatalog-table ods_plat_industry_rel \
 --hcatalog-partition-keys dt \
 --hcatalog-partition-values ${dt} \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
-
 echo 'usercenter.user'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/usercenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
 --query "select id,platform,tenant_id,seller_id,parent_id,\`name\`,mobile,email,nickname,sex,birthday,hobbies,icon,\`type\`,flag,pay_password,status,create_time,modify_time,create_user,modify_user,failed_login_count,yn,login_time,login_num,pay_password_safe,seller_pay_password,logout_time,job_number,remark,is_sales_man,is_buyer_man,is_cut_man from user where  \$CONDITIONS" \
 --driver com.mysql.jdbc.Driver \
---split-by platform \
+--split-by id \
 --hcatalog-database ods \
 --hcatalog-table ods_user \
 --hcatalog-partition-keys dt \
 --hcatalog-partition-values ${dt} \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
-
-
 echo 'basecenter.base_dictionary'+${dt}
-sqoop import  \
+sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/basecenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
@@ -175,6 +166,107 @@ sqoop import  \
 --hcatalog-partition-values ${dt} \
 --hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
+echo 'storecenter.inbound_bill'+${dt}
+sqoop import \
+--connect jdbc:mysql://10.2.0.92:3306/storecenter?serverTimezone=GMT%2B8 \
+--username root \
+--password 123456 \
+--query "select id,sign_bill_id,type,order_id,seller_id,shop_id,shop_name,status,order_amount,inbound_amount,purchase_date,create_time,audit_time,audit_user_id,audit_username,audit_remark,modify_time,modify_user,warehouse_code,warehouse_name,supplier_shop_id,supplier_shop_name,manage_user_id,manage_username,org_code,org_parent_code,inbound_remark,operate_user_id,operate_user_name,operate_time,cut_order_id,customer_shop_id,customer_shop_name,is_refuse_receive from inbound_bill where  \$CONDITIONS" \
+--driver com.mysql.jdbc.Driver \
+--split-by id \
+--create-hcatalog-table \
+--hcatalog-database ods \
+--hcatalog-table ods_inbound_bill \
+--hcatalog-partition-keys dt \
+--hcatalog-partition-values ${dt} \
+--hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
+echo 'storecenter.inbound_bill_detail'+${dt}
+sqoop import \
+--connect jdbc:mysql://10.2.0.92:3306/storecenter?serverTimezone=GMT%2B8 \
+--username root \
+--password 123456 \
+--query "select id,inbound_bill_id,order_id,order_detail_id,item_id,sku_id,item_name,item_type,sku_pic_url,sku_sale_attr,shop_sku_code,order_num,price,inbound_num,real_inbound_num,inbound_reel,real_inbound_reel,create_time,brand_id,cid from inbound_bill_detail where  \$CONDITIONS" \
+--driver com.mysql.jdbc.Driver \
+--split-by id \
+--create-hcatalog-table \
+--hcatalog-database ods \
+--hcatalog-table ods_inbound_bill_detail \
+--hcatalog-partition-keys dt \
+--hcatalog-partition-values ${dt} \
+--hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
+echo 'storecenter.outbound_bill'+${dt}
+sqoop import \
+--connect jdbc:mysql://10.2.0.92:3306/storecenter?serverTimezone=GMT%2B8 \
+--username root \
+--password 123456 \
+--query "select id,type,order_id,shop_id,shop_name,buyer_shop_id,buyer_shop_name,status,sign_status,sign_time,sign_shop_id,sign_user_id,real_sign_user,sign_remark,order_amount,create_time,audit_time,audit_user_id,audit_user_name,audit_remark,outbound_time,modify_time,modify_user,warehouse_code,warehouse_name,manage_user_id,manage_username,org_code,org_parent_code,outbound_remark,operate_user_id,operate_user_name,operate_time,license_plate_num,driver_id,driver_name,logistics_code,logistics_no,freight_label_num,cut_order_id,consignee_name,consignee_mobile,consignee_mail,province_code,city_code,country_code,town_code,province_name,city_name,country_name,town_name,detail_address,expect_receive_time,reclaim_status from outbound_bill where  \$CONDITIONS" \
+--driver com.mysql.jdbc.Driver \
+--split-by id \
+--create-hcatalog-table \
+--hcatalog-database ods \
+--hcatalog-table ods_outbound_bill \
+--hcatalog-partition-keys dt \
+--hcatalog-partition-values ${dt} \
+--hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
 
+echo 'storecenter.outbound_bill_detail'+${dt}
+sqoop import \
+--connect jdbc:mysql://10.2.0.92:3306/storecenter?serverTimezone=GMT%2B8 \
+--username root \
+--password 123456 \
+--query "select id,outbound_bill_id,order_id,order_detail_id,cid,brand_id,item_id,sku_id,item_name,sku_pic_url,sku_sale_attr,shop_sku_code,order_num,price,outbound_num,real_outbound_num,sign_num,outbound_reel,real_outbound_reel,sign_reel,piece_weight,total_weight,create_time from outbound_bill_detail where  \$CONDITIONS" \
+--driver com.mysql.jdbc.Driver \
+--split-by id \
+--create-hcatalog-table \
+--hcatalog-database ods \
+--hcatalog-table ods_outbound_bill_detail \
+--hcatalog-partition-keys dt \
+--hcatalog-partition-values ${dt} \
+--hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
+
+echo 'goodscenter.item_master'+${dt}
+sqoop import \
+--connect jdbc:mysql://10.2.0.92:3306/goodscenter?serverTimezone=GMT%2B8 \
+--username root \
+--password 123456 \
+--query "select id,shop_id,sku_code,origin_id,origin_sku_code,item_name,brand_id,cid,sale_attr,pic_url,status,item_type,qualification_effect_date,need_update_qualification,create_time,create_user,modify_time,modify_user from item_master where  \$CONDITIONS" \
+--driver com.mysql.jdbc.Driver \
+--split-by id \
+--create-hcatalog-table \
+--hcatalog-database ods \
+--hcatalog-table ods_item_master \
+--hcatalog-partition-keys dt \
+--hcatalog-partition-values ${dt} \
+--hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
+
+echo 'storecenter.warehouse_item'+${dt}
+sqoop import \
+--connect jdbc:mysql://10.2.0.92:3306/storecenter?serverTimezone=GMT%2B8 \
+--username root \
+--password 123456 \
+--query "select id,shop_id,shop_name,warehouse_code,warehouse_name,shop_sku_code,origin_sku_code,item_name,item_pic_url,inventory,occupied_inventory,inventory_min,inventory_max,check_inventory,reel,status,reason,audit_username,audit_user_id,audit_time,item_id,sku_id,supplier_shop_id,supplier_shop_name,customer_shop_id,customer_shop_name,item_type,memo,create_time,create_user,modify_time,modify_user from warehouse_item where  \$CONDITIONS" \
+--driver com.mysql.jdbc.Driver \
+--split-by id \
+--create-hcatalog-table \
+--hcatalog-database ods \
+--hcatalog-table ods_warehouse_item \
+--hcatalog-partition-keys dt \
+--hcatalog-partition-values ${dt} \
+--hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'
+
+echo 'goodscenter.item_brand'+${dt}
+sqoop import \
+--connect jdbc:mysql://10.2.0.92:3306/goodscenter?serverTimezone=GMT%2B8 \
+--username root \
+--password 123456 \
+--query "select brand_id,brand_name,brand_name_cn,brand_name_en,brand_key,brand_logo_url,registrant,registered_number,tm_type,status,create_time,update_time,create_user,update_user,yn from item_brand where  \$CONDITIONS" \
+--driver com.mysql.jdbc.Driver \
+--split-by brand_id \
+--create-hcatalog-table \
+--hcatalog-database ods \
+--hcatalog-table ods_item_brand \
+--hcatalog-partition-keys dt \
+--hcatalog-partition-values ${dt} \
+--hcatalog-storage-stanza 'stored as parquet tblproperties ("orc.compress"="SNAPPY")'

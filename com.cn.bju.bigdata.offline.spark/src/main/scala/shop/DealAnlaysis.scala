@@ -44,18 +44,6 @@ object DealAnlaysis {
 
 
     //解析hdfs_page -- 需埋点
-    //    spark.sql(
-    //      """
-    //        |select
-    //        |url,
-    //        |refer,
-    //        |finger_print,
-    //        |user_cookies,
-    //        |time_out,
-    //        |from
-    //        |bjubigdata_hdfs_db.ods_start_log
-    //        |where url is not null  and to_date(time_in) = '$dt'
-    //        |""".stripMargin).createOrReplaceTempView("hdfs_page")
 
     /**
      * 支付订单数，即成交单量：--合并successful_transaction
@@ -68,34 +56,13 @@ object DealAnlaysis {
      * 店铺各页面的访问人数。
      * 00:00-24:00内，同一访客多次访问只被计算一次。
      */
-    //    spark.sql(
-    //      s"""
-    //         |witch t1 as(
-    //         |SELECT
-    //         |item_id,
-    //         |finger_print
-    //         |from  hdfs_page
-    //         |GROUP BY item_id,finger_print
-    //         |)
-    //         |select
-    //         |item_id,
-    //         |count(1) shop_user_uv
-    //         |from t1
-    //         |group by item_id
-    //         |""".stripMargin)
+
     /**
      * 浏览量：-- 需埋点
      * 店铺各页面被用户访问的次数。
      * 用户多次打开或刷新同一个页面，浏览量累加。
      */
-    //    spark.sql(
-    //      s"""
-    //         |SELECT
-    //         |item_id,
-    //         |count(1) as shop_uv
-    //         |from  hdfs_page
-    //         |GROUP BY item_id
-    //         |""".stripMargin)
+
 
     //店铺下区分平台金额
     spark.sql(
@@ -160,11 +127,6 @@ object DealAnlaysis {
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url, "shop_sale_succeed_info", StarvConfig.properties)
-
-    //      .write
-//      .mode(SaveMode.Append)
-//      .jdbc(StarvConfig.url, "shop_sale_succeed_info", StarvConfig.properties)
-
 
     //全平台店铺下退款原因排行
     spark.sql(
@@ -258,11 +220,6 @@ object DealAnlaysis {
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url, "shop_refund_reason", StarvConfig.properties)
-
-    //      .write
-//      .mode(SaveMode.Append)
-//      .jdbc(properties.get("url").toString(), "shop_refund_reason", properties)
-
 
     //--------------全平台店铺下退款商品排行
     spark.sql(
@@ -368,10 +325,6 @@ object DealAnlaysis {
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url, "shop_refund_sku", StarvConfig.properties)
-
-//      .write
-//      .mode(SaveMode.Append)
-//      .jdbc(properties.get("url").toString(), "shop_refund_sku", properties)
 
     /**
      * 成功退款金额
@@ -479,9 +432,6 @@ object DealAnlaysis {
          |order_paid_tmp t2
          |on t1.shop_id = t2.shop_id
          |""".stripMargin))
-//               .write
-//               .mode(SaveMode.Append)
-//               .jdbc(properties.get("url").toString(),"shop_refund_info",properties)
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url, "shop_refund_info", StarvConfig.properties)

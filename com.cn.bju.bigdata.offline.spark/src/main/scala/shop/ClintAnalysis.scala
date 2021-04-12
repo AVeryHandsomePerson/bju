@@ -70,7 +70,7 @@ object ClintAnalysis {
         |then buyer_id end) as new_user_dis_number -- 当天成交的新用户数
         |from
         |order_tmp
-        |-- where present_day = 1
+        |where present_day = 1
         |group by shop_id,order_type
         |""".stripMargin).createOrReplaceTempView("client_order_type")
     //全平台
@@ -87,7 +87,7 @@ object ClintAnalysis {
         |then buyer_id end) as new_user_dis_number -- 当天成交的新用户数
         |from
         |order_tmp
-        |-- where present_day = 1
+        |where present_day = 1
         |group by shop_id
         |""".stripMargin).createOrReplaceTempView("client_order_tmp")
 
@@ -121,9 +121,6 @@ object ClintAnalysis {
          |from
          |client_order_tmp
          |""".stripMargin))
-//      .write
-//      .mode(SaveMode.Append)
-//      .jdbc(properties.get("url").toString(), "shop_client_analysis", properties)
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url,"shop_client_analysis",StarvConfig.properties)
@@ -151,7 +148,7 @@ object ClintAnalysis {
          |payment_total_money - (num * cost_price) as profit
          |from
          |orders_merge_detail
-         |where paid = 2 and refund = 0
+         |where order_type = 6 or order_type = 8
          |),
          |t2 as(
          |select
@@ -196,7 +193,7 @@ object ClintAnalysis {
          |payment_total_money - (num * cost_price) as profit
          |from
          |orders_merge_detail
-         |where paid = 2 and refund = 0
+         |where order_type = 6 or order_type = 8
          |),
          |t2 as(
          |select
@@ -231,55 +228,52 @@ object ClintAnalysis {
          |t3
          |where profit_top <=10
          |""".stripMargin))
-//      .write
-//      .mode(SaveMode.Append)
-//      .jdbc(properties.get("url").toString(), "shop_client_sale_top", properties)
       .write
       .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"client_sale_top",StarvConfig.properties)
+      .jdbc(StarvConfig.url,"shop_client_sale_top",StarvConfig.properties)
 
     /**
      * 分平台 省份排行
      */
-    spark.sql(
-      s"""
-         |with t1 as(
-         |select
-         |shop_id,
-         |order_type,
-         |province_name,
-         |count(distinct buyer_id) as sale_user_count,
-         |round(sum(payment_total_money),2) as sale_succeed_money
-         |from
-         |orders_merge_detail
-         |where paid = 2 and refund = 0
-         |group by shop_id,order_type,province_name
-         |),
-         |t2 as (select
-         |shop_id,
-         |order_type,
-         |province_name,
-         |sale_user_count,
-         |sale_succeed_money,
-         |sum(sale_succeed_money) over(partition by shop_id) as total_province_money,
-         |row_number() over(partition by shop_id,order_type,province_name order by sale_succeed_money desc) as money_top
-         |from
-         |t1
-         |)
-         |select
-         |shop_id,
-         |order_type,
-         |province_name,
-         |sale_user_count,
-         |sale_succeed_money,
-         |round(sale_succeed_money/total_province_money,2) as sale_ratio,
-         |$dt as dt
-         |from
-         |t2
-         |""".stripMargin)
-      .write
-      .mode(SaveMode.Append)
-      .jdbc(StarvConfig.url,"goods_province_type_top",StarvConfig.properties)
+//    spark.sql(
+//      s"""
+//         |with t1 as(
+//         |select
+//         |shop_id,
+//         |order_type,
+//         |province_name,
+//         |count(distinct buyer_id) as sale_user_count,
+//         |round(sum(payment_total_money),2) as sale_succeed_money
+//         |from
+//         |orders_merge_detail
+//         |where paid = 2 and refund = 0
+//         |group by shop_id,order_type,province_name
+//         |),
+//         |t2 as (select
+//         |shop_id,
+//         |order_type,
+//         |province_name,
+//         |sale_user_count,
+//         |sale_succeed_money,
+//         |sum(sale_succeed_money) over(partition by shop_id) as total_province_money,
+//         |row_number() over(partition by shop_id,order_type,province_name order by sale_succeed_money desc) as money_top
+//         |from
+//         |t1
+//         |)
+//         |select
+//         |shop_id,
+//         |order_type,
+//         |province_name,
+//         |sale_user_count,
+//         |sale_succeed_money,
+//         |round(sale_succeed_money/total_province_money,2) as sale_ratio,
+//         |$dt as dt
+//         |from
+//         |t2
+//         |""".stripMargin)
+//      .write
+//      .mode(SaveMode.Append)
+//      .jdbc(StarvConfig.url,"goods_province_type_top",StarvConfig.properties)
 
 
 

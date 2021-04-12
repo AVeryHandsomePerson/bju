@@ -25,7 +25,6 @@ object BroadcastUtils {
       .toMap
     spark.sparkContext.broadcast(userMap)
   }
-
   def getIndustryNameMap(spark: SparkSession,dt:String): Broadcast[Map[String, String]] = {
     import spark.implicits._
     val industryMap = spark.sql(
@@ -42,10 +41,9 @@ object BroadcastUtils {
       .toMap
     spark.sparkContext.broadcast(industryMap)
   }
-
   def getItemNameMap(spark: SparkSession,dt:String): Broadcast[Map[Long, String]] = {
     import spark.implicits._
-    val industryMap = spark.sql(
+    val skuMap = spark.sql(
       s"""
          |select
          |sku_id,
@@ -55,10 +53,20 @@ object BroadcastUtils {
          |""".stripMargin)
       .map(row => (row.getLong(0), row.getString(1)))
       .collect()
+    val allSkuMap = spark.sql(
+      s"""
+         |select
+         |id,
+         |item_name
+         |from
+         |ods.ods_item_master
+         |where dt = $dt
+         |""".stripMargin)
+      .map(row => (row.getLong(0), row.getString(1)))
+      .collect().union(skuMap)
       .toMap
-    spark.sparkContext.broadcast(industryMap)
+    spark.sparkContext.broadcast(allSkuMap)
   }
-
   def getShopNameMap(spark: SparkSession,dt:String): Broadcast[Map[Long, String]] = {
     import spark.implicits._
     val industryMap = spark.sql(
@@ -75,7 +83,6 @@ object BroadcastUtils {
       .toMap
     spark.sparkContext.broadcast(industryMap)
   }
-
   def getShopTypeMap(spark: SparkSession,dt:String): Broadcast[Map[Long, String]] = {
     import spark.implicits._
     val industryMap = spark.sql(
@@ -92,5 +99,36 @@ object BroadcastUtils {
       .toMap
     spark.sparkContext.broadcast(industryMap)
   }
-
+  def getCidThreeMap(spark: SparkSession,dt:String): Broadcast[Map[String, String]] = {
+    import spark.implicits._
+    val industryMap = spark.sql(
+      s"""
+         |select
+         |cat_3d_id,
+         |cat_3d_name
+         |from
+         |dwd.dim_goods_cat
+         |where dt = $dt
+         |""".stripMargin)
+      .map(row => (row.getString(0), row.getString(1)))
+      .collect()
+      .toMap
+    spark.sparkContext.broadcast(industryMap)
+  }
+  def getBrandThreeMap(spark: SparkSession,dt:String): Broadcast[Map[Long, String]] = {
+    import spark.implicits._
+    val industryMap = spark.sql(
+      s"""
+         |select
+         |brand_id,
+         |brand_name
+         |from
+         |ods.ods_item_brand
+         |where dt = $dt
+         |""".stripMargin)
+      .map(row => (row.getLong(0), row.getString(1)))
+      .collect()
+      .toMap
+    spark.sparkContext.broadcast(industryMap)
+  }
 }

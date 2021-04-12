@@ -108,8 +108,8 @@ object PaaSGoodsAnalysis {
          |(
          |select
          |*
-         |from ods.ods_item
-         |-- where dt = $dt
+         |dwd.fact_item
+         |where dt = $dt
          |) t2
          |on t1.shop_id = t2.shop_id
          |left join
@@ -166,12 +166,12 @@ object PaaSGoodsAnalysis {
         |on t1.cid = t3.cat_3d_id
         |order by orders_succeed_number desc
         |""".stripMargin)
-      .write
-      .mode(SaveMode.Append)
-      .jdbc(properties.get("url").toString(),"platform_goods_info",properties)
 //      .write
 //      .mode(SaveMode.Append)
-//      .jdbc(StarvConfig.url,"goods_sale",StarvConfig.properties)
+//      .jdbc(properties.get("url").toString(),"platform_goods_info",properties)
+      .write
+      .mode(SaveMode.Append)
+      .jdbc(StarvConfig.url,"platform_goods_info",StarvConfig.properties)
 
 
 
@@ -481,8 +481,8 @@ object PaaSGoodsAnalysis {
          |count(distinct item_id) as item_number,
          |count(distinct case when status = 4 then  item_id end) as shelf_item_number
          |from
-         |ods.ods_item
-         |-- where dt = $dt
+         |dwd.fact_item
+         |where dt = $dt
          |group by shop_id
          |)
          |select
@@ -518,8 +518,8 @@ object PaaSGoodsAnalysis {
         |$saleNumber as sale_number,
         |$dt as dt
         |from
-        |ods.ods_item
-        |-- where dt = $dt
+        |dwd.fact_item
+        |where dt = $dt
         |""".stripMargin)
       .write
       .mode(SaveMode.Append)

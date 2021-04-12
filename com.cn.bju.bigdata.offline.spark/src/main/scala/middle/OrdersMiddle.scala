@@ -12,12 +12,13 @@ object OrdersMiddle {
       .config("hive.exec.dynamic.partition.mode", "nonstrict")
       .enableHiveSupport()
       .getOrCreate()
-    val dt = new DateTime(args(0)).toString("yyyy-MM-dd")
+    val dt = args(0)
     spark.sql(
-      """
+      s"""
         |select
         |shop_id,
         |case when order_type = 1 then "TC" else "TB" end as order_type,
+        |case when (order_type = 6 or order_type = 8) then "PO" end as po_type,
         |buyer_id,
         |order_id,
         |paid,
@@ -30,7 +31,7 @@ object OrdersMiddle {
         |seller_id
         |from
         |dwd.fact_orders
-        |where parent_order_id != 0
+        |where parent_order_id != 0 and dt = $dt -- and end_zipper_time = '9999-12-31'
         |""".stripMargin).createOrReplaceTempView("orders")
     spark.sqlContext.cacheTable("orders")
     /**
@@ -46,19 +47,23 @@ object OrdersMiddle {
          |item_name,
          |cost_price,
          |sku_id,
+         |cid,
          |num
-         |from ods.ods_orders_detail
+         |from dwd.fact_orders_detail
+         |where dt=$dt
          |),
          |t3 as (
          |select
          |order_id,
          |province_name
          |from dwd.fact_orders_receive
+         |where dt=$dt
          |)
          |insert overwrite table dwd.dw_orders_merge_detail
          |select
          |a.shop_id,
          |a.order_type,
+         |a.po_type,
          |a.buyer_id,
          |a.paid,
          |a.refund,
@@ -73,6 +78,7 @@ object OrdersMiddle {
          |b.cost_price,
          |b.payment_total_money,
          |a.order_id,
+         |b.cid,
          |c.province_name
          |from orders  a
          |left join
@@ -83,7 +89,7 @@ object OrdersMiddle {
          |""".stripMargin)
     //获取 退货表 退货明细表 后续获取当天分区的
     spark.sql(
-      """
+      s"""
         |select
         |id,
         |order_id,
@@ -91,9 +97,10 @@ object OrdersMiddle {
         |refund_reason,
         |modify_time
         |from dwd.fact_refund_apply
+        |where dt = $dt and end_zipper_time = '9999-12-31'
         |""".stripMargin).createOrReplaceTempView("refund_apply")
     spark.sql(
-      """
+      s"""
         |select
         |id,
         |refund_id,
@@ -101,9 +108,9 @@ object OrdersMiddle {
         |sku_id,
         |refund_num,
         |refund_price
-        |from dwd.fact_refund_details
+        |from dwd.fact_refund_detail
+        |where dt = $dt and end_zipper_time = '9999-12-31'
         |""".stripMargin).createOrReplaceTempView("refund_detail")
-
     //退货表和退货明细表合并
      spark.sql(
        """
@@ -148,7 +155,8 @@ object OrdersMiddle {
          |on a.order_id = b.order_id
          |""".stripMargin)
     //生成sku 信息和item 商城表 关联出 sku 和 商品名称总表 按天分区
-    spark.sql(
+
+    spark.sql (
       s"""
         |insert overwrite table dwd.dwd_sku_name
         |select
@@ -167,7 +175,8 @@ object OrdersMiddle {
         |select
         |*
         |from
-        |ods.ods_item
+        |dwd.fact_item
+        |where end_zipper_time = '9999-12-31'
         |) b
         |on a.item_id = b.item_id
         |""".stripMargin)

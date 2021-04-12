@@ -51,4 +51,18 @@ object UDFRegister{
       userMap.value.getOrElse(userId,"")
     })
   }
+
+  def cidThreeMapping(spark:SparkSession,dt:String): Unit ={
+    val cidMap = BroadcastUtils.getCidThreeMap(spark, dt)
+    spark.udf.register("cid_three_mapping", func = (userId: String) => {
+      cidMap.value.getOrElse(userId,"")
+    })
+  }
+
+  def brandThreeMapping(spark:SparkSession,dt:String): Unit ={
+    val brandMap = BroadcastUtils.getBrandThreeMap(spark, dt)
+    spark.udf.register("brand_three_mapping", func = (userId: Long) => {
+      brandMap.value.getOrElse(userId,"")
+    })
+  }
 }

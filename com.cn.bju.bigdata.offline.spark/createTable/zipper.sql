@@ -16,10 +16,10 @@ create external table dwd.fact_item
     status                   int comment '商品状态,1:未发布、2:待审核、3:待上架、4:在售、5:已下架、6:锁定、7:申请解锁、8:平台下架、9:系统下架、10:定时下架、11:下线、20:审核驳回、30:删除 ',
     type                     int comment '1:普通商品 2:虚拟商品',
     item_name                string comment '商品名称',
-    shelve_time              date comment '上架时间',
-    off_shelve_time          date comment '下架时间',
-    task_shelve_time         date comment '定时上架时间',
-    task_off_shelve_time     date comment '定时下架时间',
+    shelve_time              string comment '上架时间',
+    off_shelve_time          string comment '下架时间',
+    task_shelve_time         string comment '定时上架时间',
+    task_off_shelve_time     string comment '定时下架时间',
     origin                   string comment '商品产地',
     weight                   string comment '商品毛重',
     volume                   string comment '商品体积',
@@ -32,9 +32,9 @@ create external table dwd.fact_item
     unit_code                string comment '单位编码',
     unit_name                string comment '单位名称',
     quotation_way            string comment '报价方式  1: 按产品数量报价  2：按产品规格报价',
-    create_time              date comment '创建日期',
+    create_time              string comment '创建日期',
     create_user              bigint,
-    update_time              date comment '修改日期',
+    update_time              string comment '修改日期',
     update_user              bigint,
     yn                       int comment '是否有效',
     sign                     string comment '标记',
@@ -56,12 +56,12 @@ create external table dwd.fact_item
     create_zipper_time       string comment '有效开始时间',
     end_zipper_time          string comment '有效结束时间'
 )
-    PARTITIONED BY (
-        dt string
-        )
-    stored as parquet
-    location '/user/hive/warehouse/dwd.db/fact_item'
-    tblproperties ("orc.compression" = "snappy");
+PARTITIONED BY (
+    dt string
+    )
+stored as parquet
+location '/user/hive/warehouse/dwd.db/fact_item'
+tblproperties ("orc.compression" = "snappy");
 
 set hive.exec.dynamici.partition=true;
 set hive.exec.dynamic.partition.mode=nonstrict;
@@ -123,7 +123,7 @@ select item_id,
            end      as create_zipper_time,
        '9999-12-31' as end_zipper_time,
        date_format(create_time, 'yyyyMMdd')
-from ods.ods_item
+from ods.ods_item where dt=20210225
 
 
 create external table dwd.fact_orders
@@ -216,12 +216,12 @@ create external table dwd.fact_orders
     create_zipper_time     string comment '有效开始时间',
     end_zipper_time        string comment '有效结束时间'
 ) COMMENT '订单拉链表'
-    PARTITIONED BY (
-        dt string
-        )
-    stored as parquet
-    location '/user/hive/warehouse/dwd.db/fact_orders'
-    tblproperties ("orc.compression" = "snappy");
+PARTITIONED BY (
+    dt string
+    )
+stored as parquet
+location '/user/hive/warehouse/dwd.db/fact_orders'
+tblproperties ("orc.compression" = "snappy");
 --动态分区 在spark-sql中执行
 set hive.exec.dynamici.partition=true;
 set hive.exec.dynamic.partition.mode=nonstrict;
@@ -301,13 +301,134 @@ self_pick_flag,
 expect_receive_time,
 delivery_remark,
 case
-    when modify_time is not null
-        then to_date(modify_time)
-    else to_date(create_time)
-    end      as create_zipper_time,
+when modify_time is not null
+    then to_date(modify_time)
+else to_date(create_time)
+end      as create_zipper_time,
 '9999-12-31' as end_zipper_time,
 date_format(create_time, 'yyyyMMdd')
 from ods.ods_orders;
+
+--订单明细拉链表
+create
+external table dwd.fact_orders_detail
+(
+    `id`                  bigint,
+    `order_id`            bigint comment '订单的主键ID',
+    `item_id`             bigint comment '商品ID',
+    `cid`                 bigint comment '商品的类目ID',
+    `brand_id`            bigint,
+    `sku_id`              bigint comment 'skuid',
+    `sku_code`            varchar(255) comment '商家SKU编码',
+    `item_name`           varchar(100) comment '商品名称',
+    `sku_pic_url`         varchar(255) comment '商品图片',
+    `sku_sale_attr_str`   varchar(255) comment '商品销售属性中文名称',
+    `item_original_price` decimal(10, 2) comment '商品的原始价格',
+    `cost_price`          decimal(10, 2) comment '成本价',
+    `payment_total_money` decimal(10, 2) comment '支付的总价格（不含运费）',
+    `payment_price`       decimal(10, 2) comment '支付的单价（不含运费）',
+    `cut_price`           decimal(16, 4) comment '分切单价',
+    `cut_price_total`     decimal(16, 4) comment '分切总价',
+    `refund`              int comment '退款标记',
+    `exchange`            int comment '是否换货  0未换货  1换货',
+    `num`                 decimal(24, 8) comment '商品数量',
+    `sheet_num`           int comment '张数',
+    `reel`                int comment '卷数',
+    `discount_money`      decimal(10, 2) comment '总的优惠金额',
+    `freight_template_id` bigint comment '运费模板ID',
+    `delivery_type`       int comment '运送方式',
+    `seller_id`           bigint,
+    `shop_id`             bigint,
+    `buyer_item_id`       bigint comment '买方商品编码',
+    `buyer_sku_id`        bigint comment '买方SKUID',
+    `buyer_sku_code`      varchar(255) comment '买方商家SKU编码',
+    `evaluation`          varchar(20) comment '订单商品评价状态1为评价，2以评价',
+    `create_time`         string comment '创建时间',
+    `modify_time`         string comment '修改时间',
+    `create_user`         bigint comment '创建者',
+    `modify_user`         bigint comment '修改者',
+    `is_gift`             int comment '是否是赠品  1：是  0，不是',
+    `inbound_num`         decimal(16, 4) comment '入库数量',
+    `outbound_num`        decimal(16, 4) comment '出库数量',
+    `weight_unit`         int comment '克重',
+    `width_unit`          int comment '幅宽',
+    `length_unit`         int comment '长度',
+    `purchase_num`        decimal(16, 4) comment '采购量',
+    `divided_balance`     decimal(14, 2) comment '分摊的余额金额',
+    `delivery_date`       string comment '交货时间',
+    `urgent_type`         int comment '是否加急 0不加急 1加急',
+    `already_cut`         int comment '是否已分切 0未分切 1已分切',
+    `already_outbound`    int comment '是否已出库 0未出库 1已出库',
+    `work_order_no`       varchar(64) comment '工单号',
+    `create_zipper_time`     string comment '有效开始时间',
+    `end_zipper_time`        string comment '有效结束时间'
+) comment '订单明细表'
+PARTITIONED BY (
+dt string
+)
+stored as parquet
+location '/user/hive/warehouse/dwd.db/fact_orders_detail'
+tblproperties ("orc.compression" = "snappy");
+
+
+--初始化拉链表
+insert overwrite table dwd.fact_orders_detail
+select
+    id,
+    order_id,
+    item_id,
+    cid,
+    brand_id,
+    sku_id,
+    sku_code,
+    item_name,
+    sku_pic_url,
+    sku_sale_attr_str,
+    item_original_price,
+    cost_price,
+    payment_total_money,
+    payment_price,
+    cut_price,
+    cut_price_total,
+    refund,
+    exchange,
+    num,
+    sheet_num,
+    reel,
+    discount_money,
+    freight_template_id,
+    delivery_type,
+    seller_id,
+    shop_id,
+    buyer_item_id,
+    buyer_sku_id,
+    buyer_sku_code,
+    evaluation,
+    create_time,
+    modify_time,
+    create_user,
+    modify_user,
+    is_gift,
+    inbound_num,
+    outbound_num,
+    weight_unit,
+    width_unit,
+    length_unit,
+    purchase_num,
+    divided_balance,
+    delivery_date,
+    urgent_type,
+    already_cut,
+    already_outbound,
+    work_order_no,
+    case
+        when modify_time is not null
+            then to_date(modify_time)
+        else to_date(create_time)
+        end      as create_zipper_time,
+    '9999-12-31' as end_zipper_time,
+    date_format(create_time, 'yyyyMMdd')
+from ods.ods_orders_detail where dt = '20210329' ;
 
 
 --收货地址拉链表
@@ -336,13 +457,13 @@ create table dwd.fact_orders_receive
     create_zipper_time string comment '有效开始时间',
     end_zipper_time    string comment '有效结束时间'
 )
-    comment '订单收货信息拉链表'
-    PARTITIONED BY (
-        dt string
-        )
-    stored as parquet
-    location '/user/hive/warehouse/dwd.db/fact_orders_receive'
-    tblproperties ("orc.compression" = "snappy");
+comment '订单收货信息拉链表'
+PARTITIONED BY (
+    dt string
+    )
+stored as parquet
+location '/user/hive/warehouse/dwd.db/fact_orders_receive'
+tblproperties ("orc.compression" = "snappy");
 
 --初始化拉链表
 insert overwrite table dwd.fact_orders_receive
@@ -415,7 +536,7 @@ create external table dwd.fact_refund_detail
         dt string
         )
     stored as parquet
-    location '/user/hive/warehouse/dwd.db/fact_refund_details'
+    location '/user/hive/warehouse/dwd.db/fact_refund_detail'
     tblproperties ("orc.compression" = "snappy");
 ---------初始化退货拉链表
 
@@ -539,69 +660,70 @@ create external table dwd.fact_refund_apply
 
 
 insert overwrite table dwd.fact_refund_apply
-select id,
-       refund_no,
-       type,
-       refund_type,
-       order_id,
-       order_status,
-       refund_status,
-       refund_reason,
-       question_description,
-       receiving,
-       audit_id,
-       audit_name,
-       audit_time,
-       audit_notes,
-       refund_total_money,
-       apply_refund_money,
-       province_code,
-       province_name,
-       city_code,
-       city_name,
-       country_code,
-       country_name,
-       town_code,
-       town_name,
-       detail_address,
-       refund_address,
-       refund_receiver,
-       refund_mobile,
-       refund_directions,
-       create_time,
-       modify_time,
-       create_user,
-       modify_user,
-       yn,
-       manage_user_id,
-       manage_username,
-       seller_org_code,
-       seller_org_parent_code,
-       buyer_manage_user_id,
-       buyer_manage_username,
-       buyer_org_code,
-       buyer_org_parent_code,
-       create_flag,
-       buyer_id,
-       buyer_name,
-       buyer_shop_id,
-       buyer_shop_name,
-       seller_id,
-       seller_name,
-       shop_id,
-       shop_name,
-       inbound_num,
-       outbound_num,
-       all_item_num,
-       consignment,
-       store_complete,
-       balance_amount,
-       is_create_bound_bill,
-       case
-           when modify_time is not null
-               then to_date(modify_time)
-           else to_date(create_time)
-           end      as create_zipper_time,
-       '9999-12-31' as end_zipper_time,
-       date_format(create_time, 'yyyyMMdd')
+select
+id,
+refund_no,
+`type`,
+refund_type,
+order_id,
+order_status,
+refund_status,
+refund_reason,
+question_description,
+receiving,
+audit_id,
+audit_name,
+audit_time,
+audit_notes,
+refund_total_money,
+apply_refund_money,
+province_code,
+province_name,
+city_code,
+city_name,
+country_code,
+country_name,
+town_code,
+town_name,
+detail_address,
+refund_address,
+refund_receiver,
+refund_mobile,
+refund_directions,
+create_time,
+modify_time,
+create_user,
+modify_user,
+yn,
+manage_user_id,
+manage_username,
+seller_org_code,
+seller_org_parent_code,
+buyer_manage_user_id,
+buyer_manage_username,
+buyer_org_code,
+buyer_org_parent_code,
+create_flag,
+buyer_id,
+buyer_name,
+buyer_shop_id,
+buyer_shop_name,
+seller_id,
+seller_name,
+shop_id,
+shop_name,
+inbound_num,
+outbound_num,
+all_item_num,
+consignment,
+store_complete,
+balance_amount,
+is_create_bound_bill,
+case
+    when modify_time is not null
+        then to_date(modify_time)
+    else to_date(create_time)
+    end      as create_zipper_time,
+'9999-12-31' as end_zipper_time,
+date_format(create_time, 'yyyyMMdd')
 from ods.ods_refund_apply

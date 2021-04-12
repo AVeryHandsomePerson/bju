@@ -18,29 +18,6 @@ object OneGoodsAnalysis {
     //注册udf
     UDFRegister.skuMapping(spark, dt)
 
-
-    //商品和订单表关联
-    //    spark.sql(
-    //      s"""
-    //         |select
-    //         |a.shop_id,
-    //         |b.paid
-    //         |from
-    //         |(
-    //         |select
-    //         |*
-    //         |from ods.ods_item
-    //         |) a
-    //         |left join
-    //         |(
-    //         |select
-    //         |* from
-    //         |dwd.fact_orders
-    //         |where parent_order_id != 0
-    //         |-- and dt = $dt
-    //         |) b
-    //         |on a.shop_id = b.shop_id
-    //         |""".stripMargin)
     //最新上架的前10商品数
     spark.sql(
       s"""
@@ -51,8 +28,8 @@ object OneGoodsAnalysis {
          |item_name,
          |row_number() over(partition by shop_id order by shelve_time desc) as profit_top
          |from
-         |ods.ods_item
-         |-- where dt = $dt
+         |dwd.fact_item
+         |where end_zipper_time = '9999-12-31'
          |)
          |select
          |shop_id,
@@ -89,38 +66,10 @@ object OneGoodsAnalysis {
 
 
     //解析hdfs_page -- 需埋点
-    //    spark.sql(
-    //      """
-    //        |select
-    //        |url,
-    //        |refer,
-    //        |finger_print,
-    //        |user_cookies,
-    //        |time_out,
-    //        |from
-    //        |bjubigdata_hdfs_db.ods_start_log
-    //        |where url is not null  and to_date(time_in) = '$dt'
-    //        |""".stripMargin).createOrReplaceTempView("hdfs_page")
+
     /**
      * 每个商品 访客数 -- 需埋点
      */
-    //    spark.sql(
-    //      s"""
-    //         |witch t1 as(
-    //         |SELECT
-    //         |item_id,
-    //         |sku_id,
-    //         |finger_print
-    //         |from  hdfs_page
-    //         |GROUP BY item_id,sku_id,finger_print
-    //         |)
-    //         |select
-    //         |item_id,
-    //         |sku_id,
-    //         |count(1) shop_user_uv
-    //         |from t1
-    //         |group by item_id,sku_id
-    //         |""".stripMargin).createOrReplaceTempView("shop_user_visit")
 
 
     /**
@@ -128,33 +77,7 @@ object OneGoodsAnalysis {
      * 支付客户数/访客数。
      * --需埋点
      */
-    //    spark.sql(
-    //      """
-    //        |witch
-    //        |succeed_user as(
-    //        |select
-    //        |shop_id,
-    //        |sku_id,
-    //        |round(sum(payment_total_money),2) as sale_succeed_money,
-    //        |count(distinct buyer_id) as sale_user_count
-    //        |from
-    //        |dwd.dw_orders_merge_detail
-    //        |where paid = 2
-    //        |group by shop_id,sku_id
-    //        |)
-    //        |select
-    //        |a.shop_id,
-    //        |a.sale_succeed_money,
-    //        |case when b.shop_user_uv is null
-    //        |then 0 else
-    //        |a.sale_user_count/b.shop_user_uv
-    //        |end as sku_rate
-    //        |from
-    //        |succeed_user a
-    //        |left join
-    //        |shop_user_visit b
-    //        |on a.shop_id = b.item_id and a.sku_id = b.sku_id
-    //        |""".stripMargin)
+
 
     /**
      * 1、加购商品件数( 商品分析-商品明细)：
@@ -164,34 +87,6 @@ object OneGoodsAnalysis {
      * 加购人数( 商品分析-商品明细)：
      * 即加购的客户的数量。当筛选时，暂时不具备合计的加购客户数。
      */
-
-    /**
-     * 下单客户数( 商品分析-商品明细)：
-     * 下单商品的客户数，下单即算，包含下单未支付订单，不剔除取消订单
-     */
-    //    spark.sql(
-    //      s"""
-    //         |with t1 as(
-    //         |select
-    //         |shop_id,
-    //         |sku_id,
-    //         |buyer_id
-    //         |from
-    //         |dwd.dw_orders_merge_detail
-    //         |group by shop_id,sku_id,buyer_id
-    //         |)
-    //         |select
-    //         |shop_id,
-    //         |sku_id,
-    //         |count(distinct order_id) as sale_user_count,
-    //         |$dt as dt
-    //         |from t1
-    //         |group by shop_id,sku_id
-    //         |""".stripMargin)
-    //      .write
-    //      .mode(SaveMode.Append)
-    //      .jdbc(StarvConfig.url,"order_sale_user",StarvConfig.properties)
-
 
     /**
      * 支付件数
@@ -242,84 +137,21 @@ object OneGoodsAnalysis {
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url, "shop_goods_pay_info", StarvConfig.properties)
 
-    //
-    //
-    //
-
-
     /**
      * 下单-转化率： -- 需埋点
      * 下单客户数/访客数
      */
-    //    spark.sql(
-    //      """
-    //        |witch
-    //        |succeed_user as(
-    //        |select
-    //        |shop_id,
-    //        |sku_id,
-    //        |count(distinct buyer_id) as sale_user_count
-    //        |from
-    //        |dwd.dw_orders_merge_detail
-    //        |group by shop_id,sku_id
-    //        |),
-    //        |select
-    //        |a.shop_id,
-    //        |case when b.shop_user_uv is null
-    //        |then 0 else
-    //        |a.sale_user_count/b.shop_user_uv
-    //        |end as sku_rate
-    //        |from
-    //        |succeed_user a
-    //        |left join
-    //        |shop_user_visit b
-    //        |on a.shop_id = b.item_id and a.sku_id = b.sku_id
-    //        |""".stripMargin)
 
     /**
      * 浏览量( 商品分析-商品明细)： -- 需埋点
      * 商品的浏览量。合计的浏览量等于每个商品的浏览量之和。
      */
-    //    spark.sql(
-    //      s"""
-    //         |SELECT
-    //         |item_id,
-    //         |sku_id,
-    //         |count(1) shop_pv
-    //         |from  hdfs_page
-    //         |GROUP BY item_id,sku_id
-    //         |""".stripMargin)
 
 
     /**
      * UV价值( 商品分析-商品明细)： -- 需埋点
      * 商品的成交金额/访客数
      */
-    //    spark.sql(
-    //      """
-    //        |witch
-    //        |succeed_money as(
-    //        |select
-    //        |shop_id,
-    //        |sku_id,
-    //        |round(sum(payment_total_money),2) as sale_money_count
-    //        |from
-    //        |dwd.dw_orders_merge_detail
-    //        |where paid = 2 and refund = 0
-    //        |group by shop_id,sku_id
-    //        |),
-    //        |select
-    //        |a.shop_id,
-    //        |case when b.shop_user_uv is null
-    //        |then 0 else
-    //        |a.sale_money_count/b.shop_user_uv
-    //        |end as uv_rate
-    //        |from
-    //        |succeed_money a
-    //        |left join
-    //        |shop_user_visit b
-    //        |on a.shop_id = b.item_id and a.sku_id = b.sku_id
-    //        |""".stripMargin)
 
     /**
      * 详情页跳出率( 商品分析-商品明细)： -- 需埋点

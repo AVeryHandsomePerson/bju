@@ -1,5 +1,6 @@
 package com.cn.bju.spring.bigdataspringboot.controller;
 
+import com.cn.bju.spring.bigdataspringboot.bean.platform.PagerBean;
 import com.cn.bju.spring.bigdataspringboot.bean.shop.*;
 import com.cn.bju.spring.bigdataspringboot.service.ShopGoodsService;
 import org.apache.commons.lang3.StringUtils;
@@ -24,12 +25,11 @@ public class ShopGoodsController {
 
     @RequestMapping("/getShelves")
     @ResponseBody
-    public ResponseData getGoodsShelves(@RequestParam Map<String, String> param) {
+    public ResponseData getGoodsNumber(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(shopGoodsService.getGoodsNumber(shopId, dt));
+        if (StringUtils.isNotEmpty(shopId)) {
+            data.setData(shopGoodsService.getGoodsNumber(param));
             data.setCode(1000);
             return data;
         }
@@ -44,9 +44,9 @@ public class ShopGoodsController {
     public ResponseData getShopNewPutAway(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(shopGoodsService.getShopNewPutAway(shopId, dt));
+
+        if (StringUtils.isNotEmpty(shopId)) {
+            data.setData(shopGoodsService.getShopNewPutAway(param));
             data.setCode(1000);
             return data;
         }
@@ -61,9 +61,9 @@ public class ShopGoodsController {
     public ResponseData getShopGoodsSaleTop(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(shopGoodsService.getShopGoodsSaleTop(shopId, dt));
+
+        if (StringUtils.isNotEmpty(shopId)) {
+            data.setData(shopGoodsService.getShopGoodsSaleTop(param));
             data.setCode(1000);
             return data;
         }
@@ -79,9 +79,9 @@ public class ShopGoodsController {
     public ResponseData getGoodsSale(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(shopGoodsService.getGoodsSale(shopId, dt));
+
+        if (StringUtils.isNotEmpty(shopId)) {
+            data.setData(shopGoodsService.getGoodsSale(param));
             data.setCode(1000);
             return data;
         }
@@ -95,13 +95,13 @@ public class ShopGoodsController {
     public ResponseData getSaleSucceedInfo(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
+
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+        if (StringUtils.isNotEmpty(shopId)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(shopGoodsService.getSaleSucceedInfo(shopId, dt));
+                data.setData(shopGoodsService.getSaleSucceedInfo(param));
             } else {
-                data.setData(shopGoodsService.getSaleSucceedInfoType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getSaleSucceedInfoType(param));
             }
             data.setCode(1000);
             return data;
@@ -116,9 +116,8 @@ public class ShopGoodsController {
     public ResponseData getGoodsMoneyTop(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(shopGoodsService.getGoodsMoneyTop(shopId, dt));
+        if (StringUtils.isNotEmpty(shopId)) {
+            data.setData(shopGoodsService.getGoodsMoneyTop(param));
             data.setCode(1000);
             return data;
         }
@@ -132,9 +131,8 @@ public class ShopGoodsController {
     public ResponseData getGoodsProfitTop(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-            data.setData(shopGoodsService.getGoodsProfitTop(shopId, dt));
+        if (StringUtils.isNotEmpty(shopId)) {
+            data.setData(shopGoodsService.getGoodsProfitTop(param));
             data.setCode(1000);
             return data;
         }
@@ -148,13 +146,12 @@ public class ShopGoodsController {
     public ResponseData getShopProvinceTop(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+        if (StringUtils.isNotEmpty(shopId)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(shopGoodsService.getShopProvinceTop(shopId, dt));
+                data.setData(shopGoodsService.getShopProvinceTop(param));
             } else {
-                data.setData(shopGoodsService.getShopProvinceTypeTop(shopId, dt, orderType));
+                data.setData(shopGoodsService.getShopProvinceTypeTop(param));
             }
             data.setCode(1000);
             return data;
@@ -169,13 +166,12 @@ public class ShopGoodsController {
     public ResponseData getShopProvince(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+        if (StringUtils.isNotEmpty(shopId)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(shopGoodsService.getShopProvince(shopId, dt));
+                data.setData(shopGoodsService.getShopProvince(param));
             } else {
-                data.setData(shopGoodsService.getShopProvinceType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getShopProvinceType(param));
             }
             data.setCode(1000);
             return data;
@@ -185,40 +181,18 @@ public class ShopGoodsController {
         return data;
     }
 
-
-//    @RequestMapping("/getSalSuc")
-//    @ResponseBody
-//    public ResponseData getGoodsSuccessfulSale(@RequestParam Map<String, String> param) {
-//        ResponseData data = new ResponseData();
-//        String shopId = param.getOrDefault("shopId", "");
-//        String dt = param.getOrDefault("dt", "");
-//        String orderType = param.getOrDefault("type", "");
-//        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
-//            if (StringUtils.isEmpty(orderType)) {
-//                data.setData(shopGoodsService.getGoodsSuccSale(shopId, dt));
-//            } else {
-//                data.setData(shopGoodsService.getGoodsSuccSaleType(shopId, dt, orderType));
-//            }
-//            data.setCode(1000);
-//            return data;
-//        }
-//        data.setMsg("请检查参数是否为空");
-//        data.setCode(1200);
-//        return data;
-//    }
-
     @RequestMapping("/getClientSale")
     @ResponseBody
     public ResponseData getClientSale(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
+
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+        if (StringUtils.isNotEmpty(shopId)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(shopGoodsService.getClientSale(shopId, dt));
+                data.setData(shopGoodsService.getClientSale(param));
             } else {
-                data.setData(shopGoodsService.getClientSaleType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getClientSaleType(param));
             }
             data.setCode(1000);
             return data;
@@ -233,13 +207,13 @@ public class ShopGoodsController {
     public ResponseData getClientSaleTopType(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
+
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+        if (StringUtils.isNotEmpty(shopId)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(shopGoodsService.getClientSaleTop(shopId, dt));
+                data.setData(shopGoodsService.getClientSaleTop(param));
             } else {
-                data.setData(shopGoodsService.getClientSaleTopType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getClientSaleTopType(param));
             }
             data.setCode(1000);
             return data;
@@ -248,7 +222,6 @@ public class ShopGoodsController {
         data.setCode(1200);
         return data;
     }
-
 
     //退款信息
     @RequestMapping("/getRefundInfo")
@@ -256,13 +229,13 @@ public class ShopGoodsController {
     public ResponseData getRefundIndex(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
+
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+        if (StringUtils.isNotEmpty(shopId)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(shopGoodsService.getShopRefundInfo(shopId, dt));
+                data.setData(shopGoodsService.getShopRefundInfo(param));
             } else {
-                data.setData(shopGoodsService.getShopRefundInfoType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getShopRefundInfoType(param));
             }
             data.setCode(1000);
             return data;
@@ -271,19 +244,20 @@ public class ShopGoodsController {
         data.setCode(1200);
         return data;
     }
+
     //退款理由
     @RequestMapping("/getRefundReason")
     @ResponseBody
     public ResponseData getRefundReason(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
+
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+        if (StringUtils.isNotEmpty(shopId)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(shopGoodsService.getShopRefundReason(shopId, dt));
+                data.setData(shopGoodsService.getShopRefundReason(param));
             } else {
-                data.setData(shopGoodsService.getShopRefundReasonType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getShopRefundReasonType(param));
             }
             data.setCode(1000);
             return data;
@@ -299,13 +273,13 @@ public class ShopGoodsController {
     public ResponseData getRefundSku(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
+
         String orderType = param.getOrDefault("type", "");
-        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)) {
+        if (StringUtils.isNotEmpty(shopId)) {
             if (StringUtils.isEmpty(orderType)) {
-                data.setData(shopGoodsService.getShopRefundSku(shopId, dt));
+                data.setData(shopGoodsService.getShopRefundSku(param));
             } else {
-                data.setData(shopGoodsService.getShopRefundSkuType(shopId, dt, orderType));
+                data.setData(shopGoodsService.getShopRefundSkuType(param));
             }
             data.setCode(1000);
             return data;
@@ -314,41 +288,22 @@ public class ShopGoodsController {
         data.setCode(1200);
         return data;
     }
-
-
-//    @RequestMapping("/getSaleUser")
-//    @ResponseBody
-//    public ResponseData getSaleUser(@RequestParam Map<String, String> param) {
-//        ResponseData data = new ResponseData();
-//        String shopId = param.getOrDefault("shopId", "");
-//        String dt = param.getOrDefault("dt", "");
-//        String skuId = param.getOrDefault("skuId", "");
-//        if (StringUtils.isNotEmpty(shopId) && StringUtils.isNotEmpty(dt)&& StringUtils.isNotEmpty(skuId)) {
-//            data.setData(shopGoodsService.getSaleUser(shopId,skuId, dt));
-//            data.setCode(1000);
-//            return data;
-//        }
-//        data.setMsg("请检查参数是否为空");
-//        data.setCode(1200);
-//        return data;
-//    }
 
     @RequestMapping("/getPayIndex")
     @ResponseBody
     public ResponseData getPayIndex(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         String shopId = param.getOrDefault("shopId", "");
-        String dt = param.getOrDefault("dt", "");
+
         String skuId = param.getOrDefault("skuId", "");
         String sourctType = param.getOrDefault("type", "");
         if (StringUtils.isNotEmpty(shopId) &&
-                StringUtils.isNotEmpty(dt) &&
                 StringUtils.isNotEmpty(skuId) &&
                 StringUtils.isNotEmpty(sourctType)) {
-            if(sourctType.equals("all")) {
-                data.setData(shopGoodsService.getPayIndex(shopId, skuId, dt, sourctType));
-            }else{
-                data.setData(shopGoodsService.getPayIndexType(shopId, skuId, dt, sourctType));
+            if (sourctType.equals("all")) {
+                data.setData(shopGoodsService.getPayIndex(param));
+            } else {
+                data.setData(shopGoodsService.getPayIndexType(param));
             }
             data.setCode(1000);
             return data;
@@ -358,5 +313,99 @@ public class ShopGoodsController {
         return data;
     }
 
+
+    @RequestMapping("/puType")
+    @ResponseBody
+    public ResponseData getShopGoodsPuType(@RequestParam Map<String, String> param) {
+        ResponseData data = new ResponseData();
+        String shopId = param.getOrDefault("shopId", "");
+        String sourctType = param.getOrDefault("type", "");
+        if (StringUtils.isNotEmpty(shopId) &&
+                StringUtils.isNotEmpty(sourctType)) {
+            data.setData(shopGoodsService.getShopGoodsPuType(param));
+            data.setCode(1000);
+            return data;
+        }
+        data.setMsg("请检查参数是否为空");
+        data.setCode(1200);
+        return data;
+    }
+
+    @RequestMapping("/puInfo")
+    @ResponseBody
+    public PagerBean getShopGoodsPuInfo(@RequestParam Map<String, String> param) {
+        PagerBean data = new PagerBean();
+        Integer page = Integer.valueOf(param.get("page"));
+        Integer limit = Integer.valueOf(param.get("limit"));
+        String shopId = param.getOrDefault("shopId", "");
+        String startTime = param.getOrDefault("startTime", "");
+        String endTime = param.getOrDefault("endTime", "");
+        if (StringUtils.isNotEmpty(shopId)) {
+            data.setRows(shopGoodsService.getShopGoodsPuInfo(shopId, startTime, endTime, page, limit));
+            data.setCode(1000);
+            return data;
+        }
+        data.setCode(1200);
+        return data;
+    }
+
+
+    @RequestMapping("/getWareHouseInOut")
+    @ResponseBody
+    public PagerBean getShopWareHouseInOut(@RequestParam Map<String, String> param) {
+        PagerBean data = new PagerBean();
+        int page = Integer.parseInt(param.getOrDefault("page", "0"));
+        int limit = Integer.parseInt(param.getOrDefault("limit", "0"));
+        String shopId = param.getOrDefault("shopId", "");
+        String sourctType = param.getOrDefault("type", "");
+        String startTime = param.getOrDefault("startTime", "");
+        String endTime = param.getOrDefault("endTime", "");
+        if (StringUtils.isNotEmpty(shopId) &&
+                StringUtils.isNotEmpty(sourctType)) {
+            if (page != 0
+                    && limit != 0) {
+                page = page-1;
+                data.setRows(shopGoodsService
+                        .getShopWareHouseInOutPage(shopId, startTime, endTime, page, limit, sourctType));
+                data.setTotal(shopGoodsService.countShopWareHouseInOutPage(param));
+                data.setCode(1000);
+                return data;
+            }
+            data.setRows(shopGoodsService.getShopWareHouseInOut(param));
+            data.setCode(1000);
+            return data;
+        }
+        data.setCode(1200);
+        return data;
+    }
+
+    @RequestMapping("/getWareHouseInfo")
+    @ResponseBody
+    public PagerBean getShopWareHouseInfo(@RequestParam Map<String, String> param) {
+        PagerBean data = new PagerBean();
+        int page = Integer.parseInt(param.getOrDefault("page", "0"));
+        int limit = Integer.parseInt(param.getOrDefault("limit", "0"));
+        String shopId = param.getOrDefault("shopId", "");
+        String sourctType = param.getOrDefault("type", "");
+        String startTime = param.getOrDefault("startTime", "");
+        String endTime = param.getOrDefault("endTime", "");
+        if (StringUtils.isNotEmpty(shopId) &&
+                StringUtils.isNotEmpty(sourctType)) {
+            if (page != 0
+                    && limit != 0) {
+                page = page-1;
+                data.setRows(shopGoodsService
+                        .getShopWareHouseInfoPage(shopId, startTime, endTime, page, limit, sourctType));
+                data.setTotal(shopGoodsService.countShopWareHouseInfoPage(param));
+                data.setCode(1000);
+                return data;
+            }
+            data.setRows(shopGoodsService.getShopWareHouseInfo(param));
+            data.setCode(1000);
+            return data;
+        }
+        data.setCode(1200);
+        return data;
+    }
 
 }

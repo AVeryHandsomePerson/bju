@@ -8,7 +8,7 @@
         select
         *
         from platform_goods_info
-        where dt = #{dt}
+        where between dt = #{startTime} and dt =#{endTime}
         order by orders_succeed_number desc,id limit #{page},#{limit}
     </select>
 
