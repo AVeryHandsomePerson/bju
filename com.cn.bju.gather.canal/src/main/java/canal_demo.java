@@ -54,7 +54,6 @@ public class canal_demo {
             if(entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONBEGIN || entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONEND) {
                 continue;
             }
-
             // 获取binlog文件名
             String logfileName = entry.getHeader().getLogfileName();
             // 获取logfile的偏移量

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.bju.spring.bigdataspringboot.dao.CommonDao">
+    <select id="getDataSourceAll" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TDataSourceBean">
+        select id,db_type,host,port,db_name,comment
+        from t_datasource
+        where status = 1
+    </select>
+    <select id="getDataSourceId" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TDataSourceBean">
+        select id,db_type,host,port,db_name,comment
+        from t_datasource
+        where status = 1 and id = #{id}
+    </select>
+    <insert id="insertGraphInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
+        insert into t_graph_info (des_sql, graph_type, condition_fields, description, db_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.desSql,jdbcType=VARCHAR}, #{item.graphType,jdbcType=VARCHAR},
+             #{item.conditionFields,jdbcType=VARCHAR},#{item.description,jdbcType=VARCHAR},
+             #{item.dbId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+</mapper>
