@@ -43,24 +43,31 @@ public class CommonController {
         data.setCode(empty ? 1200 : 1000);
         return data;
     }
+//    public ResponseData getTTDataSource(@RequestParam Map<String, String> param) {
+//        ResponseData data = new ResponseData();
+//        TDataSourceBean tDataSourceBean = commonService.getDataSourceId(param).stream().findFirst().orElse(null);
+//        if (tDataSourceBean == null) {
+//            data.setCode(1200);
+//            data.setMsg("未查到该数据库信息请检查数据源管理");
+//            return data;
+//        }
+//
+//        try {
+//            Connection connection = MysqlUtils.getMySqlConn(tDataSourceBean);
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
+//        data.setData(commonService.getDataSourceId(param));
+//        data.setCode(1200);
+//        return data;
+//    }
 
-    //插入数据信息
-    @RequestMapping("/putGraphInfo")
+    //获取模板列表
+    @RequestMapping("/getTemplateInfo")
     @ResponseBody
-    public ResponseData getTTDataSource(@RequestParam Map<String, String> param) {
+    public ResponseData getTemplateInfo(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
-        TDataSourceBean tDataSourceBean = commonService.getDataSourceId(param).stream().findFirst().orElse(null);
-        if (tDataSourceBean == null) {
-            data.setCode(1200);
-            data.setMsg("未查到该数据库信息请检查数据源管理");
-            return data;
-        }
-        try {
-            Connection connection = MysqlUtils.getMySqlConn(tDataSourceBean);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        data.setData(commonService.getDataSourceId(param));
+        data.setData(commonService.getTemplateInfo(param));
         data.setCode(1200);
         return data;
     }
@@ -76,5 +83,14 @@ public class CommonController {
         return data;
     }
 
-
+    //更新数据信息
+    @RequestMapping("/upDataGraphInfo")
+    @ResponseBody
+    public ResponseData upDataGraphInfo(@RequestBody List<TGraphInfo> param) {
+        ResponseData data = new ResponseData();
+        int result = commonService.upDataGraphInfo(param);
+        data.setMsg(result > 0 ? "SUCCESS" : "FAILED");
+        data.setCode(result > 0 ? 1000 : 1200);
+        return data;
+    }
 }

@@ -1,25 +1,26 @@
 package com.cn.bju.pick.kafka;
 
 
-import com.cn.bju.pick.common.bean.CanalRowData;
+import com.cn.bju.common.bean.CanalRowData;
 import com.cn.bju.pick.util.ConfigUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.Properties;
-
 /**
+ * @author ljh
  * kafka生产者工具类
+ * @version 1.0
  */
 public class KafkaSender {
+    //定义properties对象，封装kafka的相关参数
+    private Properties kafkaProps = new Properties();
     //定义生产者对象，value使用的是自定义序列化的方式,该序列化方式要求传递的是一个Protobufable的子类
-    private final KafkaProducer<String, CanalRowData> kafkaProducer;
+    private KafkaProducer<String, CanalRowData> kafkaProducer;
 
     //初始化kafka的生产者对象
-    public KafkaSender() {
-        //定义properties对象，封装kafka的相关参数
-        Properties kafkaProps = new Properties();
+    public KafkaSender(){
         kafkaProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, ConfigUtil.kafkaBootstrap_servers_config());
         kafkaProps.put(ProducerConfig.BATCH_SIZE_CONFIG, ConfigUtil.kafkaBatch_size_config());
         kafkaProps.put(ProducerConfig.ACKS_CONFIG, ConfigUtil.kafkaAcks());
@@ -34,10 +35,9 @@ public class KafkaSender {
 
     /**
      * 传递参数，将数据写入到kafka集群
-     *
      * @param rowData
      */
-    public void send(CanalRowData rowData) {
+    public void send(CanalRowData rowData){
         kafkaProducer.send(new ProducerRecord<>(ConfigUtil.kafkaTopic(), rowData));
     }
 }

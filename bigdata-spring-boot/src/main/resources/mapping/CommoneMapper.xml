@@ -13,6 +13,11 @@
         from t_datasource
         where status = 1 and id = #{id}
     </select>
+    <select id="getTemplateInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TemplateInfo">
+        select *
+        from t_graph_info
+    </select>
+
     <insert id="insertGraphInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
         insert into t_graph_info (des_sql, graph_type, condition_fields, description, db_id)
         values
@@ -21,5 +26,20 @@
              #{item.conditionFields,jdbcType=VARCHAR},#{item.description,jdbcType=VARCHAR},
              #{item.dbId,jdbcType=BIGINT})
         </foreach>
+    </insert>
+    <insert id="upDataGraphInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
+        update  t_graph_info set
+        <foreach collection="list" item="item" index="index" separator=",">
+            des_sql=#{item.desSql,jdbcType=VARCHAR},
+            graph_type = #{item.graphType,jdbcType=VARCHAR},
+            condition_fields = #{item.conditionFields,jdbcType=VARCHAR},
+            description = #{item.description,jdbcType=VARCHAR},
+            db_id = #{item.dbId,jdbcType=BIGINT}
+        </foreach>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id = #{item.id}
+            </foreach>
+        </where>
     </insert>
 </mapper>

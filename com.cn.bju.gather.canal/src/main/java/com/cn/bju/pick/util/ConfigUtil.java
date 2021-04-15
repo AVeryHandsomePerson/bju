@@ -3,7 +3,9 @@ package com.cn.bju.pick.util;
 import java.util.Properties;
 
 /**
- * 编写工具类读取config.properties配置文件信息
+ * @author ljh
+ *  编写工具类读取config.properties配置文件信息
+ * @version 1.0
  */
 public class ConfigUtil {
     //定义个properties对象

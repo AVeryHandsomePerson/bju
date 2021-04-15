@@ -5,21 +5,27 @@ import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.alibaba.otter.canal.protocol.Message;
-import com.cn.bju.pick.common.bean.CanalRowData;
+import com.cn.bju.common.bean.CanalRowData;
 import com.cn.bju.pick.kafka.KafkaSender;
 import com.cn.bju.pick.util.ConfigUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+/**
+ *
+ * @date 2021/4/15 18:32
+ *
+ */
 
 /**
- * canal客户端程序
+ * @author ljh
+ *  canal客户端程序
  * 与canal服务端建立连接，然后获取cancalServer端的binlog日志
+ * @version 1.0
  */
 public class CanalClient {
     private static final Logger log = LoggerFactory.getLogger(CanalClient.class);
@@ -68,7 +74,7 @@ public class CanalClient {
                 //获取batchid
                 long batchId = message.getId();
                 int size = message.getEntries().size();
-                log.info("获取binlog数据的条数:"+size);
+//                log.info("获取binlog数据的条数:"+size);
                 if (size != 0) {
                     //将binlog日志进行解析，解析后的数据就是Map对象
                     Map binlogMessageToMap = binlogMessageToMap(message);
@@ -78,6 +84,7 @@ public class CanalClient {
                     if (binlogMessageToMap.size() > 0) {
                         //有数据，将数据发送到kafka集群
                         kafkaSender.send(rowData);
+//                        System.out.println(rowData);
                     }
                     canalConnector.ack(batchId);
                 }else{
@@ -130,7 +137,9 @@ public class CanalClient {
 
             // 获取所有行上的变更
             Map<String, String> columnDataMap = new HashMap<>();
+            // 获取存储数据，并将二进制字节数据解析为RowChange实体
             CanalEntry.RowChange rowChange = CanalEntry.RowChange.parseFrom(entry.getStoreValue());
+
             List<CanalEntry.RowData> columnDataList = rowChange.getRowDatasList();
             for (CanalEntry.RowData rowData : columnDataList) {
                 if (eventType.equals("insert") || eventType.equals("update")) {

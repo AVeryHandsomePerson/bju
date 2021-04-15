@@ -25,7 +25,6 @@ public class MysqlUtils {
 
 
     public static synchronized Connection getMySqlConn(TDataSourceBean ds) throws SQLException {
-
         if (ds.getId() == null) {
             return null;
         }

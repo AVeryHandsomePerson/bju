@@ -1,13 +1,16 @@
-package com.cn.bju.pick.common.protobuf;
+package com.cn.bju.common.protobuf;
 
 
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
+
 /**
- * 实现kakfa-value的自定义序列化对象
+ * @author ljh
+ *  实现kakfa-value的自定义序列化对象
  * 要求传递的泛型必须是继承自ProtoBufable接口的实现类，才可以被序列化成功
+ * @version 1.0
  */
 public class ProtoBufSerializer implements Serializer<ProtoBufable> {
     @Override

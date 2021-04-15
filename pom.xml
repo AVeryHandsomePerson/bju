@@ -12,6 +12,7 @@
         <module>com.cn.bju.bigdata.offline.spark</module>
         <module>com.cn.bju.bigdata.streaming.flink</module>
         <module>com.cn.bju.gather.canal</module>
+        <module>com.cn.bju.bigdata.common</module>
     </modules>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

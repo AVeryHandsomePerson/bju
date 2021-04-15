@@ -1,19 +1,22 @@
-package com.cn.bju.pick.common.bean;
+package com.cn.bju.common.bean;
 
+
+import cn.bju.canal.protobuf.CanalModel;
 import com.alibaba.fastjson.JSON;
-import com.cn.bju.pick.common.protobuf.ProtoBufable;
+import com.cn.bju.common.protobuf.ProtoBufable;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * @author ljh
  * 这个类是canal数据的protobuf的实现类
- * 能够使用protobuf序列化成bean对象
- * 目的：将binlog解析后的map对象，转换成portobuf序列化后的字节码数据，最终写入到kafka集群
+ *能够使用protobuf序列化成bean对象
+ *目的：将binlog解析后的map对象，转换成portobuf序列化后的字节码数据，最终写入到kafka集群
+ * @version 1.0
  */
 public class CanalRowData implements ProtoBufable {
-
     private String logfileName;
     private Long logfileOffset;
     private Long executeTime;
@@ -101,7 +104,7 @@ public class CanalRowData implements ProtoBufable {
     public CanalRowData(byte[] bytes){
         try {
             //将字节码数据反序列成对象
-            com.cn.bju.protobuf.CanalModel.RowData rowData = com.cn.bju.protobuf.CanalModel.RowData.parseFrom(bytes);
+            CanalModel.RowData rowData = CanalModel.RowData.parseFrom(bytes);
             this.logfileName = rowData.getLogfileName();
             this.logfileOffset = rowData.getLogfileOffset();
             this.executeTime = rowData.getExecuteTime();
@@ -123,7 +126,7 @@ public class CanalRowData implements ProtoBufable {
      */
     @Override
     public byte[] toBytes() {
-        com.cn.bju.protobuf.CanalModel.RowData.Builder builder = com.cn.bju.protobuf.CanalModel.RowData.newBuilder();
+        CanalModel.RowData.Builder builder = CanalModel.RowData.newBuilder();
         builder.setLogfileName(this.getLogfileName());
         builder.setLogfileOffset(this.getLogfileOffset());
         builder.setExecuteTime(this.getExecuteTime());
