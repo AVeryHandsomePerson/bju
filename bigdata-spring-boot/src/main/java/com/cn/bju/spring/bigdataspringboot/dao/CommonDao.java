@@ -25,8 +25,10 @@ public interface CommonDao {
     List<TDataSourceBean> getDataSourceAll(Map<String, String> param);
 
     //根据id查询连接方式
-    List<TDataSourceBean> getDataSourceId(Map<String, String> param);
+    List<TDataSourceBean> getDataSourceId(String id);
 
+    //根据ID查询图形模板信息
+    List<TemplateInfo> getTemplateInfoId(Map<String, String> param);
     //查询图形模板信息
     List<TemplateInfo> getTemplateInfo(Map<String, String> param);
 

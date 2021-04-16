@@ -74,7 +74,6 @@ public class CanalClient {
                 //获取batchid
                 long batchId = message.getId();
                 int size = message.getEntries().size();
-//                log.info("获取binlog数据的条数:"+size);
                 if (size != 0) {
                     //将binlog日志进行解析，解析后的数据就是Map对象
                     Map binlogMessageToMap = binlogMessageToMap(message);
@@ -87,8 +86,6 @@ public class CanalClient {
 //                        System.out.println(rowData);
                     }
                     canalConnector.ack(batchId);
-                }else{
-                    log.info("没有拉取到数据");
                 }
             }
         } catch (Exception e) {

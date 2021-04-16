@@ -3,7 +3,6 @@ package com.cn.bju.spring.bigdataspringboot.bean.shop;
 /**
  * @author ljh
  * @version 1.0
- * @date 2021/3/24 10:27
  */
 public class GoodsSuccSaleType {
     private  Integer shopId;

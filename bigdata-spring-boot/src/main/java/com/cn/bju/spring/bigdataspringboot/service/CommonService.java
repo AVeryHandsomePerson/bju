@@ -33,8 +33,13 @@ public class CommonService {
     }
 
     //根据id查询连接方式
-    public List<TDataSourceBean> getDataSourceId(Map<String, String> param) {
-        return commonDao.getDataSourceId(param);
+    public List<TDataSourceBean> getDataSourceId(String id) {
+        return commonDao.getDataSourceId(id);
+    }
+
+    //根据ID获取模板信息
+    public List<TemplateInfo> getTemplateInfoId(Map<String, String> param) {
+        return commonDao.getTemplateInfoId(param);
     }
 
     //获取模板列表

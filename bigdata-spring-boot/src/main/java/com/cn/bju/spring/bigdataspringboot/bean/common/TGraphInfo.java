@@ -3,7 +3,6 @@ package com.cn.bju.spring.bigdataspringboot.bean.common;
 /**
  * @author ljh
  * @version 1.0
- * @date 2021/4/14 13:58
  */
 public class TGraphInfo {
 

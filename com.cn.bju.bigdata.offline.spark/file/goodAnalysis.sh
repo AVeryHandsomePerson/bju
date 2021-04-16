@@ -1,6 +1,12 @@
 #! /bin/bash
-#dt=`date -d '-0 day' '+%Y%m%d'`
-dt=$1
+dt=$(date -d '-1 day' '+%Y%m%d')
+sh importHive.sh $dt
+if [ $? -eq 0 ]; then
+  echo '数据同步success'+$dt
+else
+  echo '数据同步fail'+$dt
+  exit 1
+fi
 echo '执行中间表'
 spark-submit \
 --master yarn \

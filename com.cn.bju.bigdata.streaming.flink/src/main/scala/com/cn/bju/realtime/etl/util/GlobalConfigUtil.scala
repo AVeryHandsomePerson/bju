@@ -11,7 +11,6 @@ import com.typesafe.config.ConfigFactory
 object GlobalConfigUtil {
   //默认在resources目录下找application名字的配置文件
   private val config = ConfigFactory.load()
-
   /**
    * 读取配置文件的配置项信息
    */
@@ -27,4 +26,9 @@ object GlobalConfigUtil {
   val `key.serializer` = config.getString("key.serializer")
   val `key.deserializer` = config.getString("key.deserializer")
   val `input.topic.cart` = config.getString("input.topic.cart")
+
+
+  def main(args: Array[String]): Unit = {
+
+  }
 }

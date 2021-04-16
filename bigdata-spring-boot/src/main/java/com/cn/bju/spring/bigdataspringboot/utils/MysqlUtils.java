@@ -4,6 +4,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.cn.bju.spring.bigdataspringboot.bean.common.TDataSourceBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,16 +25,15 @@ public class MysqlUtils {
     private static ConcurrentHashMap<Long, DruidDataSource> cacheDataSource = new ConcurrentHashMap<>();
 
 
-    public static synchronized Connection getMySqlConn(TDataSourceBean ds) throws SQLException {
+    public static synchronized JdbcTemplate getMySqlConn(TDataSourceBean ds) throws SQLException {
         if (ds.getId() == null) {
             return null;
         }
 
         if (cacheDataSource.get(ds.getId()) == null) {
-            createDataSource(ds);
+             createDataSource(ds);
         }
-
-        return cacheDataSource.get(ds.getId()).getConnection();
+        return  new JdbcTemplate(cacheDataSource.get(ds.getId()));
     }
 
     private static void createDataSource(TDataSourceBean ds) throws SQLException {

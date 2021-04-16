@@ -9,9 +9,14 @@
         where status = 1
     </select>
     <select id="getDataSourceId" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TDataSourceBean">
-        select id,db_type,host,port,db_name,comment
+        select *
         from t_datasource
         where status = 1 and id = #{id}
+    </select>
+
+    <select id="getTemplateInfoId" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TemplateInfo">
+        select *
+        from t_graph_info where id = #{id}
     </select>
     <select id="getTemplateInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TemplateInfo">
         select *
