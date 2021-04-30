@@ -10,6 +10,10 @@ import com.cn.bju.spring.bigdataspringboot.utils.Query;
 import com.cn.bju.spring.bigdataspringboot.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -18,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -30,6 +37,7 @@ import java.util.stream.Stream;
 @Slf4j
 @CrossOrigin
 public class CommonController {
+
     @Autowired
     private CommonService commonService;
     @Autowired
@@ -52,6 +60,9 @@ public class CommonController {
     public ResponseData getData(@RequestParam Map<String, String> param) {
         ResponseData data = new ResponseData();
         SqlUtils  sqlUtils = new SqlUtils();
+        String operationType = param.getOrDefault("operation_type","");
+        String shopId = param.getOrDefault("shop_id","");
+
         TemplateInfo getDataBaseInfo = commonService.getTemplateInfoId(param).stream().findFirst().orElse(null);
         if (getDataBaseInfo == null) {
             data.setCode(1200);
@@ -64,9 +75,10 @@ public class CommonController {
             data.setMsg("未检测到数据库连接信息，请检查数据源管理中是否配置");
             return data;
         }
-        if (dataSource.getDbType().equals("mysql")) {
-            try {
-                template = MysqlUtils.getMySqlConn(dataSource);
+        try {
+        if (dataSource.getDbType().equals("mysql") &&
+                operationType.equals("1")) {
+                template = MysqlUtils.getMySqlConn(dataSource,operationType);
                 data.setData(new Query(template,
                         sqlUtils.packageSql(getDataBaseInfo.getDesSql()),
                         sqlUtils.packageField(
@@ -75,12 +87,20 @@ public class CommonController {
                         param.getOrDefault("start_time", ""),
                         param.getOrDefault("end_time", "")
                         )).invoke());
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+        }else{
+                Date date = new Date();
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateString = formatter.format(date);
+                DateTime dateTime = new DateTime(DateUtils.parseDate(dateString, "yyyy-MM-dd HH:mm:ss"));
+                template = MysqlUtils.getMySqlConn(dataSource,operationType);
+                String conditionFields = shopId+","+dateTime.toString("yyyy-MM-dd")+","+ "00";
+                data.setData(new Query(template,
+                        getDataBaseInfo.getDesSql(),
+                        conditionFields).invoke());
         }
-
-
+        } catch (SQLException | ParseException throwables) {
+            throwables.printStackTrace();
+        }
         return data;
     }
 

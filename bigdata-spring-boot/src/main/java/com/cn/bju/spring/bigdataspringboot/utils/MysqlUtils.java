@@ -26,29 +26,33 @@ public class MysqlUtils {
 
     private static DruidDataSource dataSource = new DruidDataSource();
 
-    public static synchronized JdbcTemplate getMySqlConn(TDataSourceBean ds) throws SQLException {
+    public static synchronized JdbcTemplate getMySqlConn(TDataSourceBean ds,String type) throws SQLException {
         if (ds.getId() == null) {
             return null;
         }
-
         if (cacheDataSource.get(ds.getId()) == null) {
-             createDataSource(ds);
+            if(type.equals("1")){
+                createDataSource(ds,type);
+            }else{
+                mySqlDriverClass = "ru.yandex.clickhouse.ClickHouseDriver";
+                createDataSource(ds,type);
+            }
         }
         return  new JdbcTemplate(cacheDataSource.get(ds.getId()));
     }
+    //用于模板配置
     public static synchronized JdbcTemplate getMySqlConn() throws SQLException {
-
-
-
         return  new JdbcTemplate(new DictionariesMysqlUtiles().createDataSource());
     }
-
-
-    private static void createDataSource(TDataSourceBean ds) throws SQLException {
+    private static void createDataSource(TDataSourceBean ds,String type) throws SQLException {
         StringBuilder jdbcUrl = new StringBuilder();
-
-        jdbcUrl.append("jdbc:mysql://").append(ds.getHost()).append(":").append(ds.getPort()).append("/").append(ds.getDbName())
-                .append("?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=convertToNull");
+        if(type.equals("1")){
+            jdbcUrl.append("jdbc:mysql://").append(ds.getHost()).append(":").append(ds.getPort()).append("/").append(ds.getDbName())
+                    .append("?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=convertToNull");
+        }else {
+            jdbcUrl.append("jdbc:clickhouse://").append(ds.getHost()).append(":").append(ds.getPort())
+                    .append("/").append(ds.getDbName());
+        }
 
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName(mySqlDriverClass);

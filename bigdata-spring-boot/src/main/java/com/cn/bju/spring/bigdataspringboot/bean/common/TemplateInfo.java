@@ -10,6 +10,7 @@ public class TemplateInfo {
     String graphType;
     String conditionFields;
     String description;
+    String operationType;
     int dbId;
 
     public int getId() {
@@ -60,6 +61,14 @@ public class TemplateInfo {
         this.dbId = dbId;
     }
 
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
     @Override
     public String toString() {
         return "TemplateInfo{" +
@@ -68,6 +77,7 @@ public class TemplateInfo {
                 ", graphType='" + graphType + '\'' +
                 ", conditionFields='" + conditionFields + '\'' +
                 ", description='" + description + '\'' +
+                ", operationType='" + operationType + '\'' +
                 ", dbId=" + dbId +
                 '}';
     }

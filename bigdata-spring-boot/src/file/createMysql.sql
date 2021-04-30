@@ -17,12 +17,18 @@ create table t_graph_info
 (
     id               int auto_increment comment 'id'
         primary key,
-    des_sql          text null,
+    des_sql          text         null,
     graph_type       varchar(255) null comment '图形类型',
     condition_fields varchar(255) null comment '条件字段',
     description      varchar(255) null comment '业务描述',
-    db_id            int null comment '结果库连接地址'
-) comment '图形业务';
+    db_id            int          null comment '结果库连接地址',
+    operation_user   varchar(50)  null comment '操作人',
+    create_time      datetime     null comment '创建时间',
+    data_source      varchar(255) null comment 'jdbc',
+    options          text         null comment '初始化图表',
+    operation_type   varchar(5)  comment '操作类型'
+)
+    comment '图形业务';
 
 create table t_graph_template_info
 (

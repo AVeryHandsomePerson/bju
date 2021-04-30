@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 
@@ -68,14 +70,19 @@ public class Demo {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateString = formatter.format(date);
         DateTime dateTime = new DateTime(DateUtils.parseDate(dateString, "yyyy-MM-dd HH:mm:ss"));
-      System.out.println(jdbcTemplate.queryForList("select sum(money),count(orderId) from(" +
-              "select orderId,shopId,max(totalMoney) as money" +
-              " from (select " +
-              "orderId," +
-              "shopId," +
-              "case when paid = 1 then 0 else totalMoney end as totalMoney" +
-              " from dwd_order_all where shopId = 2000000030 and day='2021-04-30' and hour='10')" +
-              "group by orderId,shopId) "));
+        String conditionFields = "2000000027"+","+dateTime.toString("yyyy-MM-dd")+","+"00";
+
+
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(
+                "select max(hour),sum(money) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where shopId = cast (? as Int64) and day= ? and hour > ?) group by orderId,shopId,hour )"
+//                "select hour,count(orderId) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where cast (? as Int64) and day= ? and hour > ?) group by orderId,shopId,hour ) group by hour order by hour "
+                , conditionFields.split(","));
+
+//        System.out.println(jdbcTemplate.queryForList(
+////                "select max(hour),sum(money) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where shopId = cast (? as Int64) and day= ? and hour= ?) group by orderId,shopId,hour )"
+//                "select hour,count(orderId) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where cast (? as Int64) and day= ? and hour > ?) group by orderId,shopId,hour ) group by hour"
+//                ,conditionFields.split(",")));
+        System.out.println(maps);
 
 
     }

@@ -83,7 +83,7 @@
     <insert id="insertGraphInfo" useGeneratedKeys="true" keyProperty="id"
             parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
         insert into t_graph_info (des_sql, graph_type, condition_fields, description,
-        db_id,operation_user,create_time,data_source,`options`)
+        db_id,operation_user,create_time,data_source,`options`,operation_type)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.desSql,jdbcType=VARCHAR},
@@ -94,7 +94,8 @@
             #{item.operationUser,jdbcType=BIGINT},
             #{item.createTime,jdbcType=BIGINT},
             #{item.dataSource,jdbcType=BIGINT},
-            #{item.options,jdbcType=BIGINT}
+            #{item.options,jdbcType=BIGINT},
+            #{item.operationType,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -110,7 +111,8 @@
             operation_user = #{item.operationUser,jdbcType=BIGINT},
             create_time = #{item.createTime,jdbcType=BIGINT},
             data_source = #{item.dataSource,jdbcType=BIGINT},
-            `options` = #{item.options,jdbcType=BIGINT}
+            `options` = #{item.options,jdbcType=BIGINT},
+            operation_type = #{item.operationType,jdbcType=VARCHAR}
         </foreach>
         <where>
             <foreach collection="list" separator="or" item="item">
@@ -118,13 +120,11 @@
             </foreach>
         </where>
     </insert>
-
     <delete id="deleteDataGraphInfo" parameterType="int">
         delete
         from t_graph_info
         where id = #{id}
     </delete>
-
     <!--     插入数据库信息-->
     <insert id="insertDataBaseInfo" useGeneratedKeys="true" keyProperty="id"
             parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.DataBaseInfoBean">

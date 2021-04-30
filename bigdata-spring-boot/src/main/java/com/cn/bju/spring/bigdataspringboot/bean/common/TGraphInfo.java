@@ -16,6 +16,7 @@ public class TGraphInfo {
     String createTime;
     String dataSource;
     String options;
+    String operationType;
 
     public String getDesSql() {
         return desSql;
@@ -98,6 +99,14 @@ public class TGraphInfo {
         this.options = options;
     }
 
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
     @Override
     public String toString() {
         return "TGraphInfo{" +
@@ -111,6 +120,7 @@ public class TGraphInfo {
                 ", createTime='" + createTime + '\'' +
                 ", dataSource='" + dataSource + '\'' +
                 ", options='" + options + '\'' +
+                ", operationType='" + operationType + '\'' +
                 '}';
     }
 }
