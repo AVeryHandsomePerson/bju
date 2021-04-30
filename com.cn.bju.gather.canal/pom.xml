@@ -13,17 +13,6 @@
     <artifactId>com.cn.bju.gather.canal</artifactId>
 
 
-<!--    <properties>-->
-<!--        <maven.compiler.source>8</maven.compiler.source>-->
-<!--        <maven.compiler.target>8</maven.compiler.target>-->
-<!--        &lt;!&ndash; junit &ndash;&gt;-->
-<!--        <junit.version>4.12</junit.version>-->
-<!--        &lt;!&ndash; json &ndash;&gt;-->
-<!--        <fastjson.version>1.2.44</fastjson.version>-->
-<!--        <jackson.version>2.9.7</jackson.version>-->
-<!--        <protobuf.version>3.4.0</protobuf.version>-->
-<!--    </properties>-->
-
     <dependencies>
         <dependency>
             <groupId>org.common</groupId>
@@ -31,6 +20,34 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
 
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.cn.bju.pick.Entrance</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
 
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

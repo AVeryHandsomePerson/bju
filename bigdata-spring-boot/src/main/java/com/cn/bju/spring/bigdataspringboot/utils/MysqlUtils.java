@@ -24,6 +24,7 @@ public class MysqlUtils {
 
     private static ConcurrentHashMap<Long, DruidDataSource> cacheDataSource = new ConcurrentHashMap<>();
 
+    private static DruidDataSource dataSource = new DruidDataSource();
 
     public static synchronized JdbcTemplate getMySqlConn(TDataSourceBean ds) throws SQLException {
         if (ds.getId() == null) {
@@ -35,6 +36,13 @@ public class MysqlUtils {
         }
         return  new JdbcTemplate(cacheDataSource.get(ds.getId()));
     }
+    public static synchronized JdbcTemplate getMySqlConn() throws SQLException {
+
+
+
+        return  new JdbcTemplate(new DictionariesMysqlUtiles().createDataSource());
+    }
+
 
     private static void createDataSource(TDataSourceBean ds) throws SQLException {
         StringBuilder jdbcUrl = new StringBuilder();
@@ -63,10 +71,4 @@ public class MysqlUtils {
 
         cacheDataSource.put(ds.getId(), dataSource);
     }
-
-
-
-
-
-
 }

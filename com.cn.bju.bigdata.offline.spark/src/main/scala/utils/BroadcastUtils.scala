@@ -75,7 +75,7 @@ object BroadcastUtils {
          |shop_id,
          |shop_name
          |from
-         |ods.shop_info
+         |ods.ods_shop_info
          |where dt = $dt
          |""".stripMargin)
       .map(row => (row.getLong(0), row.getString(1)))

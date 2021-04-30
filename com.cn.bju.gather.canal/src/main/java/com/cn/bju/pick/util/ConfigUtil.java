@@ -19,31 +19,6 @@ public class ConfigUtil {
             e.printStackTrace();
         }
     }
-
-    public static String canalServerIp() {
-        return properties.getProperty("canal.server.ip");
-    }
-
-    public static int canalServerPort() {
-        return Integer.parseInt(properties.getProperty("canal.server.port"));
-    }
-
-    public static String canalServerDestination() {
-        return properties.getProperty("canal.server.destination");
-    }
-
-    public static String canalServerUsername() {
-        return properties.getProperty("canal.server.username");
-    }
-
-    public static String canalServerPassword() {
-        return properties.getProperty("canal.server.password");
-    }
-
-    public static String canalSubscribeFilter() {
-        return properties.getProperty("canal.subscribe.filter");
-    }
-
     public static String zookeeperServerIp() {
         return properties.getProperty("zookeeper.server.ip");
     }
@@ -79,11 +54,6 @@ public class ConfigUtil {
     public static String kafkaValue_serializer_class_config() {
         return properties.getProperty("kafka.value_serializer_class_config");
     }
-
-    public static String kafkaTopic() {
-        return properties.getProperty("kafka.topic");
-    }
-
 //    public static void main(String[] args) {
 //        System.out.println(kafkaTopic());
 //    }

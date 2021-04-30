@@ -37,7 +37,7 @@ public class KafkaSender {
      * 传递参数，将数据写入到kafka集群
      * @param rowData
      */
-    public void send(CanalRowData rowData){
-        kafkaProducer.send(new ProducerRecord<>(ConfigUtil.kafkaTopic(), rowData));
+    public void send(CanalRowData rowData,String kafkaTopic){
+        kafkaProducer.send(new ProducerRecord<>(kafkaTopic, rowData));
     }
 }

@@ -294,6 +294,7 @@ object GoodsAnalysis {
         |orders
         |where po_type = 'PO'
         |""".stripMargin).createOrReplaceTempView("purchase_tmp")
+
     spark.sql(
       s"""
          |select

@@ -1,5 +1,6 @@
 package com.cn.bju.spring.bigdataspringboot.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.*;
@@ -25,8 +26,12 @@ public class Query {
     }
 
     public List<Map<String,Object>> invoke() throws SQLException {
-        restrict.split(",");
-      return  template.queryForList(sql,restrict);
+        if(StringUtils.isEmpty(restrict)){
+            return template.queryForList(sql);
+        }else {
+            String[] resSplit = restrict.split(",");
+            return template.queryForList(sql,resSplit);
+        }
     }
 
 

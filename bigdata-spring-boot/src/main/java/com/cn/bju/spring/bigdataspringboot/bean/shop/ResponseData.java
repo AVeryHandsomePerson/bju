@@ -9,7 +9,16 @@ package com.cn.bju.spring.bigdataspringboot.bean.shop;
 public class ResponseData {
     private int code;
     private String msg;
+    private long total;
     private Object data;
+
+    public long getTotal() {
+        return total;
+    }
+
+    public void setTotal(long total) {
+        this.total = total;
+    }
 
     public int getCode() {
         return code;

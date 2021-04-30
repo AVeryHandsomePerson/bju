@@ -4,42 +4,113 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cn.bju.spring.bigdataspringboot.dao.CommonDao">
     <select id="getDataSourceAll" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TDataSourceBean">
-        select id,db_type,host,port,db_name,comment
+        select id, db_type, host, port, db_name, comment
         from t_datasource
-        where status = 1
     </select>
     <select id="getDataSourceId" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TDataSourceBean">
         select *
         from t_datasource
-        where status = 1 and id = #{id}
+        where id = #{id}
     </select>
 
     <select id="getTemplateInfoId" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TemplateInfo">
         select *
-        from t_graph_info where id = #{id}
+        from t_graph_info
+        where id = #{id}
     </select>
-    <select id="getTemplateInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TemplateInfo">
+    <select id="getGraphTemplateInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TemplateInfo">
         select *
         from t_graph_info
     </select>
 
-    <insert id="insertGraphInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
-        insert into t_graph_info (des_sql, graph_type, condition_fields, description, db_id)
+
+    <!-- 查询图形业务信息   -->
+    <select id="getGraphInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
+        select *
+        from t_graph_info
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="getGraphInfoAll" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
+        select *
+        from t_graph_info
+    </select>
+
+    <select id="getGraphInfoType" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
+        select *
+        from t_graph_info
+        where case
+                  when (#{description} is null or #{description} = '') and (#{startTime} is null or #{startTime} = '')
+                      then data_source = #{dataSource}
+                  when (#{description} is null or #{description} = '') and (#{dataSource} is null or #{dataSource} = '')
+                      then create_time between #{startTime} and #{endTime}
+                  when (#{startTime} is null or #{startTime} = '') and (#{dataSource} is null or #{dataSource} = '')
+                      then description = #{description}
+                  when #{startTime} is null or #{startTime} = ''
+                      then description = #{description} and data_source = #{dataSource}
+                  when #{description} is null or #{description} = ''
+                      then create_time between #{startTime} and #{endTime} and data_source = #{dataSource}
+                  when #{dataSource} is null or #{dataSource} = ''
+                      then create_time between #{startTime} and #{endTime} and description = #{description}
+                  else description = #{description}
+                      and create_time between #{startTime} and #{endTime}
+                      and data_source = #{dataSource}
+                  end
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="getGraphInfoTypeAll" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
+        select *
+        from t_graph_info
+        where case
+                  when (#{description} is null or #{description} = '') and (#{startTime} is null or #{startTime} = '')
+                      then data_source = #{dataSource}
+                  when (#{description} is null or #{description} = '') and (#{dataSource} is null or #{dataSource} = '')
+                      then create_time between #{startTime} and #{endTime}
+                  when (#{startTime} is null or #{startTime} = '') and (#{dataSource} is null or #{dataSource} = '')
+                      then description = #{description}
+                  when #{startTime} is null or #{startTime} = ''
+                      then description = #{description} and data_source = #{dataSource}
+                  when #{description} is null or #{description} = ''
+                      then create_time between #{startTime} and #{endTime} and data_source = #{dataSource}
+                  when #{dataSource} is null or #{dataSource} = ''
+                      then create_time between #{startTime} and #{endTime} and description = #{description}
+                  else description = #{description}
+                      and create_time between #{startTime} and #{endTime}
+                      and data_source = #{dataSource}
+                  end
+    </select>
+
+
+    <insert id="insertGraphInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
+        insert into t_graph_info (des_sql, graph_type, condition_fields, description,
+        db_id,operation_user,create_time,data_source,`options`)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.desSql,jdbcType=VARCHAR}, #{item.graphType,jdbcType=VARCHAR},
-             #{item.conditionFields,jdbcType=VARCHAR},#{item.description,jdbcType=VARCHAR},
-             #{item.dbId,jdbcType=BIGINT})
+            (#{item.desSql,jdbcType=VARCHAR},
+            #{item.graphType,jdbcType=VARCHAR},
+            #{item.conditionFields,jdbcType=VARCHAR},
+            #{item.description,jdbcType=VARCHAR},
+            #{item.dbId,jdbcType=BIGINT},
+            #{item.operationUser,jdbcType=BIGINT},
+            #{item.createTime,jdbcType=BIGINT},
+            #{item.dataSource,jdbcType=BIGINT},
+            #{item.options,jdbcType=BIGINT}
+            )
         </foreach>
     </insert>
-    <insert id="upDataGraphInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
-        update  t_graph_info set
+    <insert id="upDataGraphInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
+        update t_graph_info set
         <foreach collection="list" item="item" index="index" separator=",">
             des_sql=#{item.desSql,jdbcType=VARCHAR},
             graph_type = #{item.graphType,jdbcType=VARCHAR},
             condition_fields = #{item.conditionFields,jdbcType=VARCHAR},
             description = #{item.description,jdbcType=VARCHAR},
-            db_id = #{item.dbId,jdbcType=BIGINT}
+            db_id = #{item.dbId,jdbcType=BIGINT},
+            operation_user = #{item.operationUser,jdbcType=BIGINT},
+            create_time = #{item.createTime,jdbcType=BIGINT},
+            data_source = #{item.dataSource,jdbcType=BIGINT},
+            `options` = #{item.options,jdbcType=BIGINT}
         </foreach>
         <where>
             <foreach collection="list" separator="or" item="item">
@@ -47,4 +118,492 @@
             </foreach>
         </where>
     </insert>
+
+    <delete id="deleteDataGraphInfo" parameterType="int">
+        delete
+        from t_graph_info
+        where id = #{id}
+    </delete>
+
+    <!--     插入数据库信息-->
+    <insert id="insertDataBaseInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.DataBaseInfoBean">
+        insert into t_datasource (db_type, host, port, db_name, db_user, db_password, comment, create_time,
+        update_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.dbType,jdbcType=VARCHAR},
+            #{item.host,jdbcType=VARCHAR},
+            #{item.port,jdbcType=BIGINT},
+            #{item.dbName,jdbcType=VARCHAR},
+            #{item.dbUser,jdbcType=VARCHAR},
+            #{item.dbPassword,jdbcType=VARCHAR},
+            #{item.comment,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=VARCHAR},
+            #{item.updateTime,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+    <!--   分页-->
+    <select id="getDataBaseInfoAll" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.DataBaseInfoBean">
+        select *
+        from t_datasource
+    </select>
+    <select id="getDataBaseInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.DataBaseInfoBean">
+        select *
+        from t_datasource
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="selectDataBaseNameALL" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.DataBaseInfoBean">
+        select *
+        from t_datasource
+        where db_name = #{name}
+    </select>
+    <select id="selectDataBaseName" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.DataBaseInfoBean">
+        select *
+        from t_datasource
+        where db_name = #{name}
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <insert id="upDataBaseInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.DataBaseInfoBean">
+        update t_datasource set
+        <foreach collection="list" item="item" index="index" separator=",">
+            db_type=#{item.dbType,jdbcType=VARCHAR},
+            host = #{item.host,jdbcType=VARCHAR},
+            port = #{item.port,jdbcType=BIGINT},
+            db_name = #{item.dbName,jdbcType=VARCHAR},
+            db_user = #{item.dbUser,jdbcType=VARCHAR},
+            db_password = #{item.dbPassword,jdbcType=VARCHAR},
+            comment = #{item.comment,jdbcType=VARCHAR},
+            create_time =#{item.createTime,jdbcType=VARCHAR},
+            update_time = #{item.updateTime,jdbcType=VARCHAR}
+        </foreach>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id = #{item.id}
+            </foreach>
+        </where>
+    </insert>
+    <delete id="deleteDataBaseInfo" parameterType="int">
+        delete
+        from t_datasource
+        where id = #{id}
+    </delete>
+
+    <!--     保存图形模板信息-->
+    <insert id="insertGraphTemplateInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.GraphTemplateInfoBean">
+        insert into t_graph_template_info
+        (graph_info,temp_name,order_id,group_name,operation_user,create_time,graph_name,graph_describe)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.graphInfo,jdbcType=VARCHAR},
+            #{item.tempName,jdbcType=VARCHAR},
+            #{item.orderId,jdbcType=VARCHAR},
+            #{item.groupName,jdbcType=VARCHAR},
+            #{item.operationUser,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=VARCHAR},
+            #{item.graphName,jdbcType=VARCHAR},
+            #{item.graphDescribe,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+    <!--    查询全部模板信息-->
+    <select id="selectGraphTemplateInfo"
+            resultType="com.cn.bju.spring.bigdataspringboot.bean.common.GraphTemplateInfoBean">
+        select *
+        from t_graph_template_info
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="selectGraphTemplateInfoAll"
+            resultType="com.cn.bju.spring.bigdataspringboot.bean.common.GraphTemplateInfoBean">
+        select *
+        from t_graph_template_info
+    </select>
+
+    <select id="selectGraphTemplateInfoType"
+            resultType="com.cn.bju.spring.bigdataspringboot.bean.common.GraphTemplateInfoBean">
+        select *
+        from t_graph_template_info
+        where case
+                  when (#{startTime} is null or #{startTime} = '') and (#{groupName} is null or #{groupName} = '')
+                      then temp_name = #{name}
+                  when (#{name} is null or #{name} = '') and (#{groupName} is null or #{groupName} = '')
+                      then create_time between #{startTime} and #{endTime}
+                  when (#{startTime} is null or #{startTime} = '') and (#{name} is null or #{name} = '')
+                      then group_name = #{groupName}
+                  when #{startTime} is null or #{startTime} = ''
+                      then temp_name = #{name} and group_name = #{groupName}
+                  when #{name} is null or #{name} = ''
+                      then create_time between #{startTime} and #{endTime} and group_name = #{groupName}
+                  when #{groupName} is null or #{groupName} = ''
+                      then create_time between #{startTime} and #{endTime} and temp_name = #{name}
+                  else temp_name = #{name}
+                      and create_time between #{startTime} and #{endTime}
+                      and group_name = #{groupName}
+                  end
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="selectGraphTemplateInfoTypeAll"
+            resultType="com.cn.bju.spring.bigdataspringboot.bean.common.GraphTemplateInfoBean">
+        select *
+        from t_graph_template_info
+        where case
+                  when (#{startTime} is null or #{startTime} = '') and (#{groupName} is null or #{groupName} = '')
+                      then temp_name = #{name}
+                  when (#{name} is null or #{name} = '') and (#{groupName} is null or #{groupName} = '')
+                      then create_time between #{startTime} and #{endTime}
+                  when (#{startTime} is null or #{startTime} = '') and (#{name} is null or #{name} = '')
+                      then group_name = #{groupName}
+
+                  else temp_name = #{name}
+                      and
+                       create_time between #{startTime} and #{endTime}
+                      and
+                       group_name = #{groupName}
+                  end
+    </select>
+    <!--  更新模板-->
+    <insert id="upGraphTemplateInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.GraphTemplateInfoBean">
+        update t_graph_template_info set
+        <foreach collection="list" item="item" index="index" separator=",">
+            graph_info=#{item.graphInfo,jdbcType=VARCHAR},
+            temp_name = #{item.tempName,jdbcType=VARCHAR},
+            order_id = #{item.orderId,jdbcType=VARCHAR},
+            group_name = #{item.groupName,jdbcType=VARCHAR},
+            operation_user = #{item.operationUser,jdbcType=VARCHAR},
+            create_time = #{item.createTime,jdbcType=VARCHAR},
+            graph_describe = #{item.graphDescribe,jdbcType=VARCHAR},
+            graph_name = #{item.graphName,jdbcType=VARCHAR}
+        </foreach>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id = #{item.id}
+            </foreach>
+        </where>
+    </insert>
+
+
+    <delete id="deleteGraphTemplateInfo" parameterType="int">
+        delete
+        from t_graph_template_info
+        where id = #{id}
+    </delete>
+
+
+    <!--     保存图形模板信息-->
+    <insert id="insertDataGroupInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.DataGroupBean">
+        insert into t_group_info (group_name,group_describe,order_id,create_time,operation_user)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.groupName,jdbcType=VARCHAR},
+            #{item.groupDescribe,jdbcType=VARCHAR},
+            #{item.orderId,jdbcType=BIGINT},
+            #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.operationUser,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+    <!--    查询模板信息-->
+    <select id="selectDataGroupInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.DataGroupBean">
+        select *
+        from t_group_info
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="selectDataGroupInfoAll" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.DataGroupBean">
+        select *
+        from t_group_info
+    </select>
+
+    <select id="selectDataGroupNameALL" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.DataGroupBean">
+        select *
+        from t_group_info
+        where case
+                  when #{startTime} is null or #{startTime} = ''
+                      then group_name = #{name}
+                  when #{name} is null or #{name} = ''
+                      then create_time between #{startTime} and #{endTime}
+                  else group_name = #{name} and create_time between #{startTime} and #{endTime}
+                  end
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="selectDataGroupName" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.DataGroupBean">
+        select *
+        from t_group_info
+        where case
+                  when #{startTime} is null or #{startTime} = ''
+                      then group_name = #{name}
+                  when #{name} is null or #{name} = ''
+                      then create_time between #{startTime} and #{endTime}
+                  else group_name = #{name} and create_time between #{startTime} and #{endTime}
+                  end
+        order by id desc limit ${page}, ${limit}
+    </select>
+
+    <!--  更新模板-->
+    <insert id="upDataGroupInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.DataGroupBean">
+        update t_group_info set
+        <foreach collection="list" item="item" index="index" separator=",">
+            group_name=#{item.groupName,jdbcType=VARCHAR},
+            group_describe=#{item.groupDescribe,jdbcType=VARCHAR},
+            order_id=#{item.orderId,jdbcType=BIGINT},
+            create_time=#{item.createTime,jdbcType=TIMESTAMP},
+            operation_user=#{item.operationUser,jdbcType=VARCHAR}
+        </foreach>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id = #{item.id}
+            </foreach>
+        </where>
+    </insert>
+    <delete id="deleteDataGroupInfo" parameterType="int">
+        delete
+        from t_group_info
+        where id = #{id}
+    </delete>
+
+    <!-- 保存菜单信息-->
+    <insert id="insertMenuInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TMenuInfo">
+        insert into t_menu_info (
+        platform,
+        industry,
+        shop_type,
+        shop_classify,
+        `describe`,
+        one_menu,
+        two_menu,
+        three_menu,
+        order_id,
+        picture_path,
+        menu_id,
+        two_order_id
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.platform,jdbcType=VARCHAR},
+            #{item.industry,jdbcType=VARCHAR},
+            #{item.shopType,jdbcType=VARCHAR},
+            #{item.shopClassify,jdbcType=VARCHAR},
+            #{item.describe,jdbcType=VARCHAR},
+            #{item.oneMenu,jdbcType=VARCHAR},
+            #{item.twoMenu,jdbcType=VARCHAR},
+            #{item.threeMenu,jdbcType=VARCHAR},
+            #{item.orderId,jdbcType=BIGINT},
+            #{item.picturePath,jdbcType=VARCHAR},
+            #{item.menuId,jdbcType=VARCHAR},
+            #{item.twoOrderId,jdbcType=BIGINT}
+            )
+        </foreach>
+    </insert>
+    <!--    查询菜单信息-->
+    <select id="selectMenuInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TMenuInfo">
+        select *
+        from t_menu_info
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="selectMenuInfoAll" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TMenuInfo">
+        select *
+        from t_menu_info
+    </select>
+
+    <select id="selectMenuInfoType" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TMenuInfo">
+        select *
+        from t_menu_info
+        where case
+                  when (#{platform} is null or #{platform} = '') and (#{shop_type} is null or #{shop_type} = '')
+                      then industry = #{industry}
+                  when (#{industry} is null or #{industry} = '') and (#{platform} is null or #{platform} = '')
+                      then shop_type = #{shop_type}
+                  when (#{shop_type} is null or #{shop_type} = '') and (#{industry} is null or #{industry} = '')
+                      then platform = #{platform}
+
+                  when #{platform} is null or #{platform} = ''
+                      then industry = #{industry} and shop_type = #{shop_type}
+                  when #{industry} is null or #{industry} = ''
+                      then platform = #{platform} and shop_type = #{shop_type}
+                  when #{shop_type} is null or #{shop_type} = ''
+                      then platform = #{platform} and industry = #{industry}
+
+                  else platform = #{platform}
+                      and industry = #{industry}
+                      and shop_type = #{shop_type}
+                  end
+        order by id desc limit ${page}, ${limit}
+    </select>
+    <select id="selectMenuInfoTypeAll" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.TMenuInfo">
+        select *
+        from t_menu_info
+        where case
+                  when (#{platform} is null or #{platform} = '') and (#{shop_type} is null or #{shop_type} = '')
+                      then industry = #{industry}
+                  when (#{industry} is null or #{industry} = '') and (#{platform} is null or #{platform} = '')
+                      then shop_type = #{shop_type}
+                  when (#{shop_type} is null or #{shop_type} = '') and (#{industry} is null or #{industry} = '')
+                      then platform = #{platform}
+
+                  when #{platform} is null or #{platform} = ''
+                      then industry = #{industry} and shop_type = #{shop_type}
+                  when #{industry} is null or #{industry} = ''
+                      then platform = #{platform} and shop_type = #{shop_type}
+                  when #{shop_type} is null or #{shop_type} = ''
+                      then platform = #{platform} and industry = #{industry}
+
+                  else platform = #{platform}
+                      and industry = #{industry}
+                      and shop_type = #{shop_type}
+                  end
+    </select>
+
+    <!--  更新模板-->
+    <insert id="upMenuInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.DataGroupBean">
+        update t_menu_info set
+        <foreach collection="list" item="item" index="index" separator=",">
+            platform = #{item.platform,jdbcType=VARCHAR},
+            industry = #{item.industry,jdbcType=VARCHAR},
+            shop_type= #{item.shopType,jdbcType=VARCHAR},
+            shop_classify = #{item.shopClassify,jdbcType=VARCHAR},
+            `describe` = #{item.describe,jdbcType=VARCHAR},
+            one_menu = #{item.oneMenu,jdbcType=VARCHAR},
+            two_menu = #{item.twoMenu,jdbcType=VARCHAR},
+            three_menu = #{item.threeMenu,jdbcType=VARCHAR},
+            order_id = #{item.orderId,jdbcType=BIGINT},
+            picture_path = #{item.picturePath,jdbcType=VARCHAR},
+            menu_id = #{item.menuId,jdbcType=VARCHAR},
+            two_order_id = #{item.twoOrderId,jdbcType=BIGINT}
+        </foreach>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id = #{item.id}
+            </foreach>
+        </where>
+    </insert>
+    <delete id="deleteMenuInfo" parameterType="int">
+        delete
+        from t_menu_info
+        where id = #{id}
+    </delete>
+
+    <!-- 店铺一级菜单增加-->
+    <insert id="insertOneMenuInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.SOneMenuInfo">
+        insert into s_one_menu_info (
+        menu_name,
+        picture_path,
+        url,
+        order_id,
+        status,
+        logo,
+        `describe`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.menuName,jdbcType=VARCHAR},
+            #{item.picturePath,jdbcType=VARCHAR},
+            #{item.url,jdbcType=VARCHAR},
+            #{item.orderId,jdbcType=BIGINT},
+            #{item.status,jdbcType=BIGINT},
+            #{item.logo,jdbcType=VARCHAR},
+            #{item.describe,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+    <select id="selectOneMenuInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.SOneMenuInfo">
+        select *
+        from s_one_menu_info
+    </select>
+    <insert id="upOneMenuInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.SOneMenuInfo">
+        update s_one_menu_info set
+        <foreach collection="list" item="item" index="index" separator=",">
+            menu_name= #{item.menuName,jdbcType=VARCHAR},
+            picture_path=#{item.picturePath,jdbcType=VARCHAR},
+            url=#{item.url,jdbcType=VARCHAR},
+            order_id=#{item.orderId,jdbcType=BIGINT},
+            status=#{item.status,jdbcType=BIGINT},
+            logo=#{item.logo,jdbcType=VARCHAR},
+            `describe`=#{item.describe,jdbcType=VARCHAR}
+        </foreach>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id = #{item.id}
+            </foreach>
+        </where>
+    </insert>
+    <delete id="deleteOneMenuInfo" parameterType="int">
+        delete
+        from s_one_menu_info
+        where id = #{id}
+    </delete>
+    <!-- 店铺二级菜单增加-->
+    <insert id="insertTwoMenuInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.STwoMenuInfo">
+        insert into s_two_menu_info (
+        menu_name,
+        picture_path,
+        url,
+        order_id,
+        status,
+        logo,
+        `describe`,
+        one_menu_id
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.menuName,jdbcType=VARCHAR},
+            #{item.picturePath,jdbcType=VARCHAR},
+            #{item.url,jdbcType=VARCHAR},
+            #{item.orderId,jdbcType=BIGINT},
+            #{item.status,jdbcType=BIGINT},
+            #{item.logo,jdbcType=VARCHAR},
+            #{item.describe,jdbcType=VARCHAR},
+            #{item.oneMenuId,jdbcType=BIGINT}
+            )
+        </foreach>
+    </insert>
+    <select id="selectTwoMenuInfo" resultType="com.cn.bju.spring.bigdataspringboot.bean.common.STwoMenuInfo">
+        select a.id,
+               b.menu_name,
+               a.menu_name as menu_tow_name,
+               a.picture_path,
+               a.url,
+               a.order_id,
+               a.status,
+               a.logo,
+               a.describe,
+               a.one_menu_id
+        from s_two_menu_info a left join s_one_menu_info b
+        on a.one_menu_id = b.id
+    </select>
+    <insert id="upTwoMenuInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.STwoMenuInfo">
+        update s_two_menu_info set
+        <foreach collection="list" item="item" index="index" separator=",">
+            menu_name= #{item.menuName,jdbcType=VARCHAR},
+            picture_path=#{item.picturePath,jdbcType=VARCHAR},
+            url=#{item.url,jdbcType=VARCHAR},
+            order_id=#{item.orderId,jdbcType=BIGINT},
+            status=#{item.status,jdbcType=BIGINT},
+            logo=#{item.logo,jdbcType=VARCHAR},
+            `describe`=#{item.describe,jdbcType=VARCHAR},
+            one_menu_id=#{item.oneMenuId,jdbcType=BIGINT}
+        </foreach>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id = #{item.id}
+            </foreach>
+        </where>
+    </insert>
+    <delete id="deleteTwoMenuInfo" parameterType="int">
+        delete
+        from s_two_menu_info
+        where id = #{id}
+    </delete>
+
+
 </mapper>

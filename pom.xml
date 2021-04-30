@@ -35,10 +35,11 @@
         <hadoop.version>3.1.0</hadoop.version>
         <hbase.version>1.2.0</hbase.version>
         <protobuf.version>3.4.0</protobuf.version>
-        <flink.version>1.8.0</flink.version>
+        <flink.version>1.12.0</flink.version>
         <kafka.client.version>1.0.0</kafka.client.version>
         <kafka.version>0.11.0.2</kafka.version>
         <canal.version>1.1.4</canal.version>
+        <clickhouse.version>0.2.4</clickhouse.version>
         <!-- j2ee -->
         <javax.servlet-api.version>4.0.0</javax.servlet-api.version>
         <jstl.version>1.2</jstl.version>
@@ -55,7 +56,7 @@
         <jackson.version>2.9.7</jackson.version>
         <!-- db driver or pool -->
         <jedis.version>3.0.1</jedis.version>
-        <mysql.version>5.1.44</mysql.version>
+        <mysql.version>8.0.13</mysql.version>
         <avatica.version>1.10.0</avatica.version>
         <druid.version>1.1.9</druid.version>
         <!-- http client -->
@@ -172,7 +173,7 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-connector-kafka-0.11_${scala.version}</artifactId>
-                <version>${flink.version}</version>
+                <version>1.11.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
@@ -187,6 +188,11 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-streaming-java_${scala.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-clients_2.11</artifactId>
                 <version>${flink.version}</version>
             </dependency>
             <dependency>
@@ -304,6 +310,17 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
             </dependency>
+           <!--clickhouse -->
+            <!-- https://mvnrepository.com/artifact/ru.yandex.clickhouse/clickhouse-jdbc -->
+<!--            <dependency>-->
+<!--                <groupId>ru.yandex.clickhouse</groupId>-->
+<!--                <artifactId>clickhouse-jdbc</artifactId>-->
+<!--                <version>${clickhouse.version}</version>-->
+<!--            </dependency>-->
+            <!-- https://mvnrepository.com/artifact/ru.yandex.clickhouse/clickhouse-jdbc -->
+
+
+
             <!-- fastjson -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -373,6 +390,12 @@
                 <artifactId>commons-codec</artifactId>
                 <version>${commons-codec.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.bjucloud.sso</groupId>
+                <artifactId>sso-client</artifactId>
+                <version>3.1.0-SNAPSHOT</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>

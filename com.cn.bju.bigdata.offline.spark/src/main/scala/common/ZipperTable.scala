@@ -25,7 +25,7 @@ object ZipperTable {
          |*
          |from
          |ods.ods_orders
-         |where dt =$dt
+         |where dt =$dt and parent_order_id != 0
          |""".stripMargin).createOrReplaceTempView("oders_tmp")
     spark.sql(
       s"""

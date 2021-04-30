@@ -79,12 +79,16 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java_${scala.version}</artifactId>
+            <artifactId>flink-clients_2.11</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-hbase_${scala.version}</artifactId>
+            <artifactId>flink-streaming-java_${scala.version}</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--            <artifactId>flink-hbase_${scala.version}</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.apache.bahir</groupId>
             <artifactId>flink-connector-redis_${scala.version}</artifactId>
@@ -153,5 +157,34 @@
             <artifactId>flink-cep_${scala.version}</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
 
+                <configuration>
+<!--                    <archive>-->
+<!--                        <manifest>-->
+<!--                            <mainClass>com.cn.bju.pick.Entrance</mainClass>-->
+<!--                        </manifest>-->
+<!--                    </archive>-->
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

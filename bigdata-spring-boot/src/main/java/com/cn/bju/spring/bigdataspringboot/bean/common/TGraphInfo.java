@@ -12,7 +12,10 @@ public class TGraphInfo {
     String conditionFields;
     String description;
     int dbId;
-
+    String operationUser;
+    String createTime;
+    String dataSource;
+    String options;
 
     public String getDesSql() {
         return desSql;
@@ -62,6 +65,39 @@ public class TGraphInfo {
         this.id = id;
     }
 
+
+    public String getOperationUser() {
+        return operationUser;
+    }
+
+    public void setOperationUser(String operationUser) {
+        this.operationUser = operationUser;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public String getOptions() {
+        return options;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
+    }
+
     @Override
     public String toString() {
         return "TGraphInfo{" +
@@ -71,6 +107,10 @@ public class TGraphInfo {
                 ", conditionFields='" + conditionFields + '\'' +
                 ", description='" + description + '\'' +
                 ", dbId=" + dbId +
+                ", operationUser='" + operationUser + '\'' +
+                ", createTime='" + createTime + '\'' +
+                ", dataSource='" + dataSource + '\'' +
+                ", options='" + options + '\'' +
                 '}';
     }
 }
