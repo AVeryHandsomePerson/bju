@@ -26,7 +26,8 @@ create table t_graph_info
     create_time      datetime     null comment '创建时间',
     data_source      varchar(255) null comment 'jdbc',
     options          text         null comment '初始化图表',
-    operation_type   varchar(5)  comment '操作类型'
+    operation_type   varchar(5)  comment '操作类型',
+    order_by         varchar(255)  comment '排序字段'
 )
     comment '图形业务';
 

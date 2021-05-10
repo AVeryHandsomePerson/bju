@@ -1,6 +1,7 @@
 package com.cn.bju.spring.bigdataspringboot.utils;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,10 +11,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 
 /**
@@ -64,28 +62,69 @@ public class Demo {
         return dataSource;
     }
     public static void main(String[] args) throws SQLException, ParseException {
-        JdbcTemplate jdbcTemplate =  new JdbcTemplate(new Demo().createDataSource());
-
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateString = formatter.format(date);
-        DateTime dateTime = new DateTime(DateUtils.parseDate(dateString, "yyyy-MM-dd HH:mm:ss"));
-        String conditionFields = "2000000027"+","+dateTime.toString("yyyy-MM-dd")+","+"00";
-
-
-        List<Map<String, Object>> maps = jdbcTemplate.queryForList(
-                "select max(hour),sum(money) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where shopId = cast (? as Int64) and day= ? and hour > ?) group by orderId,shopId,hour )"
+//        JdbcTemplate jdbcTemplate =  new JdbcTemplate(new Demo().createDataSource());
+//
+//        Date date = new Date();
+//        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        String dateString = formatter.format(date);
+//        DateTime dateTime = new DateTime(DateUtils.parseDate(dateString, "yyyy-MM-dd HH:mm:ss"));
+//        String conditionFields = "2000000027"+","+"2021-05-06"+","+"00";
+////        String conditionFields = "2000000027"+","+dateTime.toString("yyyy-MM-dd")+","+"00";
+//
+//
+//        List<Map<String, Object>> maps = jdbcTemplate.queryForList(
+////                "select max(hour),sum(money) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where shopId = cast (? as Int64) and day= ? and hour > ?) group by orderId,shopId,hour )"
 //                "select hour,count(orderId) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where cast (? as Int64) and day= ? and hour > ?) group by orderId,shopId,hour ) group by hour order by hour "
-                , conditionFields.split(","));
+//                , conditionFields.split(","));
+//
+////        System.out.println(jdbcTemplate.queryForList(
+//////                "select max(hour),sum(money) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where shopId = cast (? as Int64) and day= ? and hour= ?) group by orderId,shopId,hour )"
+////                "select hour,count(orderId) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where cast (? as Int64) and day= ? and hour > ?) group by orderId,shopId,hour ) group by hour"
+////                ,conditionFields.split(",")));
+//        System.out.println(maps);
 
-//        System.out.println(jdbcTemplate.queryForList(
-////                "select max(hour),sum(money) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where shopId = cast (? as Int64) and day= ? and hour= ?) group by orderId,shopId,hour )"
-//                "select hour,count(orderId) from(select orderId,shopId,max(totalMoney) as money,hour from ( select orderId,shopId,case when paid = 1 then 0 else totalMoney end as totalMoney, hour from dwd_order_all where cast (? as Int64) and day= ? and hour > ?) group by orderId,shopId,hour ) group by hour"
-//                ,conditionFields.split(",")));
-        System.out.println(maps);
+
+
+        String sql = "select item_name as 商品名称,sale_user_count as 支付人数,sale_succeed_profit as 支付金额,sale_profit_ratio as 占比 from shop_goods_profit_top ";
+
+        String sqls = "";
+
+        String conditionValue = "";
+        String order = "";
+//        if(sql.contains("where")){
+//            sqls = sql+" and shop_id = ?";
+//        }else{
+//            sqls = sql+" where shop_id = ? and dt between ? and ?";
+//        }
+//
+        StringBuffer sqlBuffer = new StringBuffer();
+        sqlBuffer.append(sql);
+        if(StringUtils.isNotEmpty(conditionValue)){
+            sqlBuffer.append(" where ");
+            String[] split = conditionValue.split(",");
+            Arrays.stream(split).map( x -> x.concat(" = ?"))
+                  .forEach(x -> sqlBuffer.append(x).append(" and "));
+            sqlBuffer.append("shop_id = ? and dt between ? and ?");
+        }else {
+            sqlBuffer.append("where shop_id = ? and dt between ? and ?");
+        }
+
+        if(StringUtils.isNotEmpty(order)){
+            sqlBuffer.append(" order by ").append(order);
+        }
+
+
+
+        System.out.println(sqlBuffer);
 
 
     }
+
+
+
+
+
+
 
 
 }

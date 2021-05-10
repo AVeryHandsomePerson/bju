@@ -17,6 +17,7 @@ public class TGraphInfo {
     String dataSource;
     String options;
     String operationType;
+    String orderBy;
 
     public String getDesSql() {
         return desSql;
@@ -107,6 +108,14 @@ public class TGraphInfo {
         this.operationType = operationType;
     }
 
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
     @Override
     public String toString() {
         return "TGraphInfo{" +
@@ -121,6 +130,7 @@ public class TGraphInfo {
                 ", dataSource='" + dataSource + '\'' +
                 ", options='" + options + '\'' +
                 ", operationType='" + operationType + '\'' +
+                ", orderBy='" + orderBy + '\'' +
                 '}';
     }
 }

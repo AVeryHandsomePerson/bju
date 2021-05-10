@@ -16,9 +16,9 @@ sqoop import \
 --connect jdbc:mysql://10.2.0.92:3306/tradecenter?serverTimezone=GMT%2B8 \
 --username root \
 --password 123456 \
---table orders_detail \
---where "(date_format(create_time,'%Y%m%d') = ${dt} or date_format(modify_time,'%Y%m%d') = ${dt}) and shop_id is not null" \
+--query "select id,order_id,item_id,cid,brand_id,sku_id,sku_code,item_name,sku_pic_url,sku_sale_attr_str,item_original_price,cost_price,payment_total_money,payment_price,cut_price,cut_price_total,refund,exchange,num,sheet_num,reel,discount_money,freight_template_id,delivery_type,seller_id,shop_id,buyer_item_id,buyer_sku_id,buyer_sku_code,evaluation,create_time,modify_time,create_user,modify_user,is_gift,inbound_num,outbound_num,weight_unit,width_unit,length_unit,purchase_num,divided_balance,delivery_date,urgent_type,already_cut,already_outbound,work_order_no from orders_detail where (date_format(create_time,'%Y%m%d') = ${dt} or date_format(modify_time,'%Y%m%d') = ${dt}) and shop_id is not null and \$CONDITIONS" \
 --driver com.mysql.jdbc.Driver \
+--split-by shop_id \
 --hcatalog-database ods \
 --hcatalog-table ods_orders_detail \
 --hcatalog-partition-keys dt \

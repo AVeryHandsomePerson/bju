@@ -80,7 +80,7 @@ public class CommonController {
                 operationType.equals("1")) {
                 template = MysqlUtils.getMySqlConn(dataSource,operationType);
                 data.setData(new Query(template,
-                        sqlUtils.packageSql(getDataBaseInfo.getDesSql()),
+                        sqlUtils.packageSql(getDataBaseInfo.getDesSql(),getDataBaseInfo.getConditionFields(), getDataBaseInfo.getOrderBy()),
                         sqlUtils.packageField(
                         param.getOrDefault("condition_fields", ""),
                         param.getOrDefault("shop_id", ""),
@@ -159,15 +159,13 @@ public class CommonController {
     @RequestMapping("/insertGraphInfo")
     @ResponseBody
     public ResponseData insertGraphInfo(@RequestBody List<TGraphInfo> param) {
+        System.out.println(param);
         ResponseData data = new ResponseData();
         int result = commonService.insertGraphInfo(param);
         data.setMsg(result > 0 ? "SUCCESS" : "FAILED");
         data.setCode(result > 0 ? 1000 : 1200);
         return data;
     }
-
-
-
 
     //更新数据信息
     @RequestMapping("/upDataGraphInfo")
@@ -195,6 +193,7 @@ public class CommonController {
     @RequestMapping("/insertDataBaseInfo")
     @ResponseBody
     public ResponseData insertDataBaseInfo(@RequestBody List<DataBaseInfoBean> param) {
+        System.out.println(param);
         ResponseData data = new ResponseData();
         int result = commonService.insertDataBaseInfo(param);
         data.setMsg(result > 0 ? "SUCCESS" : "FAILED");

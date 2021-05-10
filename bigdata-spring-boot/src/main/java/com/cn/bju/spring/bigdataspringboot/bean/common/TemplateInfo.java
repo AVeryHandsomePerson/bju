@@ -11,6 +11,7 @@ public class TemplateInfo {
     String conditionFields;
     String description;
     String operationType;
+    String orderBy;
     int dbId;
 
     public int getId() {
@@ -69,6 +70,14 @@ public class TemplateInfo {
         this.operationType = operationType;
     }
 
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
     @Override
     public String toString() {
         return "TemplateInfo{" +
@@ -78,6 +87,7 @@ public class TemplateInfo {
                 ", conditionFields='" + conditionFields + '\'' +
                 ", description='" + description + '\'' +
                 ", operationType='" + operationType + '\'' +
+                ", orderBy='" + orderBy + '\'' +
                 ", dbId=" + dbId +
                 '}';
     }

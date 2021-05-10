@@ -16,6 +16,8 @@ object ZipperTable {
 
     val dt = args(0)
     val yesterDayDateTime = new DateTime(DateUtils.parseDate(dt, "yyyyMMdd")).minusDays(1).toString("yyyy-MM-dd")
+    val yesterDay = new DateTime(DateUtils.parseDate(dt, "yyyyMMdd")).minusDays(1).toString("yyyyMMdd")
+
     /**
      * 订单拉链表
      */
@@ -111,7 +113,7 @@ object ZipperTable {
         |--动态分区需要的字段
         |a.dt
         |from
-        |(select * from dwd.fact_orders where dt > $yesterDayDateTime ) a
+        |(select * from dwd.fact_orders where dt > $yesterDay ) a
         |left join
         |oders_tmp b
         |on a.order_id = b.order_id
@@ -198,7 +200,6 @@ object ZipperTable {
         |oders_tmp
         |""".stripMargin)
 
-
     /**
      * 订单明细拉链表
      */
@@ -266,7 +267,7 @@ object ZipperTable {
          |then $yesterDayDateTime else a.end_zipper_time  end as end_zipper_time,
          |a.dt
          |from
-         |(select * from dwd.fact_orders_detail where dt > $yesterDayDateTime ) a
+         |(select * from dwd.fact_orders_detail where dt > $yesterDay ) a
          |left join
          |ods_orders_detail_tmp b
          |on a.id = b.id
@@ -398,7 +399,7 @@ object ZipperTable {
         |then '$yesterDayDateTime' else a.end_zipper_time  end as end_zipper_time,
         |a.dt
         |from
-        |dwd.fact_item a
+        |(select * from dwd.fact_item where dt >  $yesterDay ) a
         |left join
         |item_tmp b
         |on a.item_id = b.item_id
@@ -503,7 +504,7 @@ object ZipperTable {
          |then $yesterDayDateTime else a.end_zipper_time  end as end_zipper_time,
          |a.dt
          |from
-         |(select * from dwd.fact_orders_receive where dt > $yesterDayDateTime ) a
+         |(select * from dwd.fact_orders_receive where dt >  $yesterDay ) a
          |left join
          |ods_orders_receive_tmp b
          |on a.id = b.id
@@ -587,7 +588,7 @@ object ZipperTable {
          |then $yesterDayDateTime else a.end_zipper_time  end as end_zipper_time,
          |a.dt
          |from
-         |(select * from dwd.fact_refund_detail where dt > $yesterDayDateTime ) a
+         |(select * from dwd.fact_refund_detail where dt >  $yesterDay ) a
          |left join
          |ods_refund_details_tmp b
          |on a.id = b.id
@@ -706,7 +707,7 @@ object ZipperTable {
          |then $yesterDayDateTime else a.end_zipper_time  end as end_zipper_time,
          |a.dt
          |from
-         |(select * from dwd.fact_refund_apply where dt > $yesterDayDateTime ) a
+         |(select * from dwd.fact_refund_apply where dt >  $yesterDay ) a
          |left join
          |ods_refund_apply_tmp b
          |on a.id = b.id

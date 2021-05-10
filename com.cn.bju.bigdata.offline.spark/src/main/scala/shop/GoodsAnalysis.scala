@@ -98,11 +98,9 @@ object GoodsAnalysis {
      * 有流量的商品的品种数占
      * 上架商品数量的比例
      */
-
     /**
      * 商品浏览量
      */
-
     /**
      * 商品关注数
      *
@@ -113,76 +111,12 @@ object GoodsAnalysis {
     /**
      * 加购商品件数
      */
-
-
-    /**
-     *
-     * 下单客户数
-     */
-    //    spark.sql(
-    //      s"""
-    //         |with t1 as(
-    //         |select
-    //         |shop_id,
-    //         |buyer_id
-    //         |from
-    //         |dwd.dw_orders_merge_detail
-    //         |group by shop_id,buyer_id
-    //         |)
-    //         |select
-    //         |shop_id,
-    //         |count(1) as sale_user_count,
-    //         |$dt as dt
-    //         |from t1
-    //         |group by shop_id
-    //         |""".stripMargin)
-    //      .write
-    //      .mode(SaveMode.Append)
-    //      .jdbc(StarvConfig.url,"place_orders_user",StarvConfig.properties)
-
-    //    /**
-    //     * 下单商品件数
-    //     */
-    //    spark.sql(
-    //      s"""
-    //         |select
-    //         |shop_id,
-    //         |round(sum(case when num is null then 0 else num end ),2) as sale_goods_number,
-    //         |$dt as dt
-    //         |from
-    //         |dwd.dw_orders_merge_detail
-    //         |group by shop_id
-    //         |""".stripMargin)
-    //         .write
-    //         .mode(SaveMode.Append)
-    //         .jdbc(StarvConfig.url,"place_orders_goods",StarvConfig.properties)
-    /**
-     * 成交商品件数
-     */
-    //    spark.sql(
-    //      s"""
-    //         |select
-    //         |shop_id,
-    //         |round(sum(num),2) as sale_succeed_number,
-    //         |$dt as dt
-    //         |from
-    //         |dwd.dw_orders_merge_detail
-    //         |where paid = 2 and refund = 0
-    //         |group by shop_id
-    //         |""".stripMargin)
-    //        .write
-    //        .mode(SaveMode.Append)
-    //        .jdbc(StarvConfig.url,"trading_goods",StarvConfig.properties)
-
-
     /**
      * 商品成交转化率   --需要埋点
      * 1.统计出商品访问数
      * 2.统计出成交客户数
      * 3.成交客户数/商品访问数
      */
-
-
     /**
      * 商品金额TOP 10
      * 1.统计支付人数
@@ -294,7 +228,6 @@ object GoodsAnalysis {
         |orders
         |where po_type = 'PO'
         |""".stripMargin).createOrReplaceTempView("purchase_tmp")
-
     spark.sql(
       s"""
          |select
@@ -336,9 +269,6 @@ object GoodsAnalysis {
          |group by t1.shop_id,t3.cat_3d_id
          |""".stripMargin)
     )
-//      .write
-//      .mode(SaveMode.Append)
-//      .jdbc(properties.get("url").toString(),"shop_goods_purchase_type",properties)
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url, "shop_goods_purchase_type", StarvConfig.properties)
@@ -356,9 +286,6 @@ object GoodsAnalysis {
          |group by
          |shop_id,sku_id
          |""".stripMargin)
-//      .write
-//      .mode(SaveMode.Append)
-//      .jdbc(properties.get("url").toString(),"shop_goods_purchase_info",properties)
       .write
       .mode(SaveMode.Append)
       .jdbc(StarvConfig.url, "shop_goods_purchase_info", StarvConfig.properties)

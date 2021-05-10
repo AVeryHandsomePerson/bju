@@ -31,7 +31,7 @@ object OrdersMiddle {
         |seller_id
         |from
         |dwd.fact_orders
-        |where parent_order_id != 0 and dt = $dt -- and end_zipper_time = '9999-12-31'
+        |where parent_order_id != 0 and dt = $dt and end_zipper_time = '9999-12-31'
         |""".stripMargin).createOrReplaceTempView("orders")
     spark.sqlContext.cacheTable("orders")
     /**
@@ -61,6 +61,7 @@ object OrdersMiddle {
          |)
          |insert overwrite table dwd.dw_orders_merge_detail
          |select
+         |distinct
          |a.shop_id,
          |a.order_type,
          |a.po_type,
@@ -87,6 +88,7 @@ object OrdersMiddle {
          |left join t3 c
          |on a.order_id = c.order_id
          |""".stripMargin)
+
     //获取 退货表 退货明细表 后续获取当天分区的
     spark.sql(
       s"""

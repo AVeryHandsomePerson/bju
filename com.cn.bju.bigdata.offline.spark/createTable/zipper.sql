@@ -123,7 +123,7 @@ select item_id,
            end      as create_zipper_time,
        '9999-12-31' as end_zipper_time,
        date_format(create_time, 'yyyyMMdd')
-from ods.ods_item where dt=20210225
+from ods.ods_item
 
 
 create external table dwd.fact_orders
@@ -428,7 +428,7 @@ select
         end      as create_zipper_time,
     '9999-12-31' as end_zipper_time,
     date_format(create_time, 'yyyyMMdd')
-from ods.ods_orders_detail where dt = '20210329' ;
+from ods.ods_orders_detail;
 
 
 --收货地址拉链表

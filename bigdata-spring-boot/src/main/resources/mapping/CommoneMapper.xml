@@ -83,7 +83,7 @@
     <insert id="insertGraphInfo" useGeneratedKeys="true" keyProperty="id"
             parameterType="com.cn.bju.spring.bigdataspringboot.bean.common.TGraphInfo">
         insert into t_graph_info (des_sql, graph_type, condition_fields, description,
-        db_id,operation_user,create_time,data_source,`options`,operation_type)
+        db_id,operation_user,create_time,data_source,`options`,operation_type,order_by)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.desSql,jdbcType=VARCHAR},
@@ -95,7 +95,8 @@
             #{item.createTime,jdbcType=BIGINT},
             #{item.dataSource,jdbcType=BIGINT},
             #{item.options,jdbcType=BIGINT},
-            #{item.operationType,jdbcType=VARCHAR}
+            #{item.operationType,jdbcType=VARCHAR},
+            #{item.orderBy,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -112,7 +113,8 @@
             create_time = #{item.createTime,jdbcType=BIGINT},
             data_source = #{item.dataSource,jdbcType=BIGINT},
             `options` = #{item.options,jdbcType=BIGINT},
-            operation_type = #{item.operationType,jdbcType=VARCHAR}
+            operation_type = #{item.operationType,jdbcType=VARCHAR},
+            order_by = #{item.orderBy,jdbcType=VARCHAR}
         </foreach>
         <where>
             <foreach collection="list" separator="or" item="item">
