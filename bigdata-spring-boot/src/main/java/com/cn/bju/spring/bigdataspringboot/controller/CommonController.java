@@ -1,5 +1,6 @@
 package com.cn.bju.spring.bigdataspringboot.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.bjucloud.sso.dto.TokenRequest;
 import com.bjucloud.sso.service.UserService;
 import com.bjucloud.usercenter.dto.UserLoginDTO;
@@ -555,12 +556,15 @@ public class CommonController {
     }
 
     @ResponseBody
-    @RequestMapping("/")
-    public String getUserList(@RequestBody TokenRequest userQueryRequest, HttpServletRequest request) {
-        UserLoginDTO userLoginDTO = userService.checkToken(userQueryRequest);
+    @RequestMapping("/login")
+    public String getUserList(@RequestParam Map<String, String> param, HttpServletRequest request) {
+        System.out.println("==========>"+param);
+        TokenRequest userQueryRequest = JSON.parseObject(JSON.toJSONString(param),TokenRequest.class);
+        System.out.println(userQueryRequest);
+//        UserLoginDTO userLoginDTO = userService.checkToken(userQueryRequest);
         HttpSession session = request.getSession();
         session.setAttribute("token",userQueryRequest);
-        session.setAttribute("userLogin",userLoginDTO);
+//        session.setAttribute("userLogin",userLoginDTO);
         return "";
     }
 

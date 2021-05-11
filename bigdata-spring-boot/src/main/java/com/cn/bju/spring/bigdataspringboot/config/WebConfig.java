@@ -16,7 +16,8 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     private static List<String> EXCLUDE_PATH = Arrays
-            .asList("/","/getJdbcInfo");
+            .asList("/login");
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new MyIntertor())
