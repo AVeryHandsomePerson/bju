@@ -20,18 +20,16 @@ public class MyIntertor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HttpSession session = request.getSession();
-        System.out.println("---------------"+session.getAttribute("token"));
         UserLoginDTO userLoginDTO = (UserLoginDTO) session.getAttribute("token");
         System.out.println(userLoginDTO.getLoginToken());
         try {
             if (!Objects.isNull(userLoginDTO.getLoginToken())){
                 return true;
             }else{
-                return false;
-//                response.sendRedirect("http://sso.serviceent.com/view/login.html");
+                response.sendRedirect("http://sso.serviceent.com/view/login.html");
             }
         }catch (NullPointerException e){
-//            response.sendRedirect("http://sso.serviceent.com/view/login.html");
+            response.sendRedirect("http://sso.serviceent.com/view/login.html");
         }
         return false;
     }
