@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	    http://www.springframework.org/schema/beans/spring-beans.xsd        
+	    http://code.alibabatech.com/schema/dubbo
+	    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <dubbo:application name="report_service"/>
+
+    <dubbo:registry id="registry" protocol="BSFRegistry" address="10.2.0.139:6022" client="zkclient"/>
+    <dubbo:reference id="userService"
+                     interface="com.bjucloud.sso.service.UserService" version="3.3.0"
+                     timeout="1000000" check="false"/>
+</beans>

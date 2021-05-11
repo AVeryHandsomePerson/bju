@@ -185,6 +185,7 @@ object DealAnlaysis {
          |select
          |t1.shop_id,
          |shop_mapping(t1.shop_id) as shop_name,
+         |refund_reason,
          |'all' as order_type,
          |t1.refund_reason_number,
          |t1.refund_money,
@@ -203,6 +204,7 @@ object DealAnlaysis {
            |select
            |t1.shop_id,
            |shop_mapping(t1.shop_id) as shop_name,
+           |refund_reason,
            |t1.order_type,
            |t1.refund_reason_number, --总退款笔数
            |t1.refund_money,--成功退款金额

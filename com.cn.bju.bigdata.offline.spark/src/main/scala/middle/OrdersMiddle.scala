@@ -43,7 +43,9 @@ object OrdersMiddle {
          |with
          |t2 as (select
          |order_id,
-         |payment_total_money+divided_balance as payment_total_money,
+         |if(payment_total_money is null,0,payment_total_money)
+         |+
+         |if(divided_balance is null,0,divided_balance) as payment_total_money,
          |item_name,
          |cost_price,
          |sku_id,
@@ -88,6 +90,8 @@ object OrdersMiddle {
          |left join t3 c
          |on a.order_id = c.order_id
          |""".stripMargin)
+
+
 
     //获取 退货表 退货明细表 后续获取当天分区的
     spark.sql(
@@ -157,7 +161,6 @@ object OrdersMiddle {
          |on a.order_id = b.order_id
          |""".stripMargin)
     //生成sku 信息和item 商城表 关联出 sku 和 商品名称总表 按天分区
-
     spark.sql (
       s"""
         |insert overwrite table dwd.dwd_sku_name

@@ -1,33 +1,31 @@
 package com.cn.bju.spring.bigdataspringboot.controller;
 
+import com.bjucloud.sso.dto.TokenRequest;
+import com.bjucloud.sso.service.UserService;
+import com.bjucloud.usercenter.dto.UserLoginDTO;
 import com.cn.bju.spring.bigdataspringboot.bean.common.*;
-import com.cn.bju.spring.bigdataspringboot.bean.platform.PagerBean;
 import com.cn.bju.spring.bigdataspringboot.bean.shop.ResponseData;
 import com.cn.bju.spring.bigdataspringboot.service.CommonService;
-import com.cn.bju.spring.bigdataspringboot.service.PaltFormGoodsService;
 import com.cn.bju.spring.bigdataspringboot.utils.MysqlUtils;
 import com.cn.bju.spring.bigdataspringboot.utils.Query;
 import com.cn.bju.spring.bigdataspringboot.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Connection;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * @author ljh
@@ -38,6 +36,8 @@ import java.util.stream.Stream;
 @CrossOrigin
 public class CommonController {
 
+    @Resource
+    private UserService userService; // 用户
     @Autowired
     private CommonService commonService;
     @Autowired
@@ -552,6 +552,16 @@ public class CommonController {
         data.setMsg(result > 0 ? "SUCCESS" : "FAILED");
         data.setCode(result > 0 ? 1000 : 1200);
         return data;
+    }
+
+    @ResponseBody
+    @RequestMapping("/")
+    public String getUserList(@RequestBody TokenRequest userQueryRequest, HttpServletRequest request) {
+        UserLoginDTO userLoginDTO = userService.checkToken(userQueryRequest);
+        HttpSession session = request.getSession();
+        session.setAttribute("token",userQueryRequest);
+        session.setAttribute("userLogin",userLoginDTO);
+        return "";
     }
 
 }
